@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ckb">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>سیستەمی مارکێت - پیشکەش</title>
+    <!-- Font Awesome & Google Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: #f4f7fc;
+            display: flex;
+            justify-content: center;
+            padding: 16px 10px 40px;
+            direction: rtl;
+        }
+        .app-container {
+            max-width: 480px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            overflow: hidden;
+            padding: 20px 18px 30px;
+        }
+        /* header */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .app-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .app-header i {
+            font-size: 24px;
+            color: #2563eb;
+            background: #eef2ff;
+            padding: 10px;
+            border-radius: 16px;
+        }
+        /* tabs */
+        .tab-bar {
+            display: flex;
+            gap: 6px;
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 40px;
+            margin-bottom: 28px;
+        }
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px 0;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #475569;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #1e293b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .tab-content {
+            display: none;
+            animation: fade 0.2s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fade { from { opacity: 0.4; } to { opacity: 1; } }
+
+        /* cards & inputs */
+        .card {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 18px 16px;
+            margin-bottom: 18px;
+            border: 1px solid #e9eef3;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            color: #0f172a;
+            margin-bottom: 16px;
+        }
+        .card-title i {
+            color: #2563eb;
+            width: 24px;
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .flex-row .grow {
+            flex: 1;
+            min-width: 120px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d1d9e6;
+            border-radius: 20px;
+            background: white;
+            font-size: 14px;
+            outline: none;
+            transition: 0.15s;
+        }
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        }
+        .btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.15s;
+            width: 100%;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #2563eb;
+            color: #2563eb;
+        }
+        .btn-outline i { color: #2563eb; }
+        .btn-success {
+            background: #0b8a4b;
+        }
+        .btn-danger {
+            background: #dc2626;
+        }
+        .btn-sm {
+            padding: 8px 12px;
+            width: auto;
+            font-size: 13px;
+        }
+        .scanner-area {
+            background: #0f172a;
+            border-radius: 28px;
+            padding: 28px 12px;
+            text-align: center;
+            color: white;
+            margin-bottom: 16px;
+        }
+        .scanner-area i {
+            font-size: 54px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        .scanner-area p {
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+        .barcode-badge {
+            background: #e9eef3;
+            padding: 8px 14px;
+            border-radius: 40px;
+            display: inline-block;
+            font-weight: 500;
+            color: #0f172a;
+            font-size: 14px;
+        }
+        .list-item {
+            background: white;
+            border-radius: 18px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border: 1px solid #e9eef3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .list-item .info { font-size: 14px; }
+        .list-item .info strong { display: block; font-size: 16px; }
+        .badge-success { background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 40px; font-size: 13px; }
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #dce3ec;
+        }
+        .total-box {
+            background: #1e293b;
+            color: white;
+            border-radius: 24px;
+            padding: 18px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .empty-state {
+            text-align: center;
+            color: #64748b;
+            padding: 30px 0;
+        }
+        .mt-2 { margin-top: 12px; }
+        .mb-2 { margin-bottom: 12px; }
+        .gap-2 { gap: 8px; }
+        .text-center { text-align: center; }
+        .w-full { width: 100%; }
+    </style>
+</head>
+<body>
+<div class="app-container" id="app">
+    <!-- Header -->
+    <div class="app-header">
+        <h1>📦 مارکێت</h1>
+        <i class="fas fa-store-alt"></i>
+    </div>
+
+    <!-- Tab navigation -->
+    <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tab-sales">فڕۆشتن</button>
+        <button class="tab-btn" data-tab="tab-products">بەرهەمەکان</button>
+        <button class="tab-btn" data-tab="tab-reports">داهات</button>
+    </div>
+
+    <!-- ========= TAB 1: فرۆشتن / سکان ========= -->
+    <div id="tab-sales" class="tab-content active">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-camera"></i> سکانی باڕکۆد</div>
+            <div class="scanner-area" id="scannerSimulation" @click="simulateScan">
+                <i class="fas fa-qrcode"></i>
+                <p>کلیک بکە بۆ سکان (کامێرا / وێنە)</p>
+                <div class="barcode-badge" style="margin-top:10px; background:#334155; color:white;">
+                    <i class="fas fa-barcode"></i> ٦٢٨٩١٣٤٧٥
+                </div>
+            </div>
+            <div class="flex-row">
+                <input type="text" placeholder="باڕکۆد یان ناو..." v-model="scanInput" @keyup.enter="addToCartByCode">
+                <button class="btn btn-sm" @click="addToCartByCode"><i class="fas fa-plus"></i> زیاد</button>
+            </div>
+            <div style="margin-top:8px;">
+                <button class="btn btn-outline btn-sm" @click="addByImage"><i class="fas fa-image"></i> بە وێنە (هەڵبژاردن)</button>
+            </div>
+        </div>
+
+        <!-- کۆدی فرۆشتن (وەسڵ) -->
+        <div class="card">
+            <div class="card-title"><i class="fas fa-receipt"></i> وەسڵی ئێستا</div>
+            <div id="cartItems">
+                <div v-if="cart.length === 0" class="empty-state">
+                    <i class="fas fa-shopping-cart" style="font-size:28px; opacity:0.3;"></i>
+                    <p>هیچ بەرهەمێک نییە</p>
+                </div>
+                <div v-for="(item, idx) in cart" :key="idx" class="list-item">
+                    <div class="info">
+                        <strong>{{ item.name }}</strong>
+                        <span>{{ item.barcode }}</span>
+                    </div>
+                    <div>
+                        <span style="margin-left:8px;">{{ item.price }} د.ع</span>
+                        <button class="btn btn-danger btn-sm" @click="removeFromCart(idx)" style="width:auto; padding:4px 10px;"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="total-box">
+                <span>کۆی گشتی</span>
+                <span><strong>{{ totalCartPrice }} د.ع</strong></span>
+            </div>
+            <button class="btn btn-success" @click="finalizeSale" :disabled="cart.length===0">
+                <i class="fas fa-check"></i> تەواوکردنی فرۆشتن
+            </button>
+        </div>
+
+        <!-- دوایین وەسڵەکان (خێرا) -->
+        <div class="card">
+            <div class="card-title"><i class="fas fa-history"></i> دوایین وەسڵەکان</div>
+            <div v-if="receipts.length === 0" class="empty-state">هیچ وەسڵێک نییە</div>
+            <div v-for="(r, idx) in receipts.slice(0,3)" :key="idx" class="list-item" style="flex-direction:column; align-items:flex-start;">
+                <div><strong>وەسڵ #{{ r.id }}</strong>  <span class="badge-success">{{ r.date }}</span></div>
+                <div style="display:flex; justify-content:space-between; width:100%;">
+                    <span>{{ r.items }} بەرهەم</span>
+                    <span><strong>{{ r.total }} د.ع</strong></span>
+                </div>
+            </div>
+            <button class="btn btn-outline btn-sm" @click="switchTab('tab-reports')"><i class="fas fa-chart-simple"></i> هەموو وەسڵەکان</button>
+        </div>
+    </div>
+
+    <!-- ========= TAB 2: بەرهەمەکان ========= -->
+    <div id="tab-products" class="tab-content">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-boxes"></i> زیادکردن / دەستکاری</div>
+            <div class="flex-row">
+                <div class="grow">
+                    <input type="text" placeholder="ناوی بەرهەم" v-model="productForm.name">
+                </div>
+                <div class="grow">
+                    <input type="text" placeholder="باڕکۆد" v-model="productForm.barcode">
+                </div>
+            </div>
+            <div class="flex-row">
+                <div class="grow">
+                    <input type="number" placeholder="نرخ" v-model="productForm.price">
+                </div>
+                <div class="grow">
+                    <input type="date" v-model="productForm.expiry">
+                </div>
+            </div>
+            <div class="flex-row">
+                <input type="number" placeholder="ژمارە (ئاراستە)" v-model="productForm.stock">
+                <button class="btn btn-sm" @click="addOrUpdateProduct"><i class="fas fa-save"></i> تۆمارکردن</button>
+            </div>
+            <div style="margin-top:8px;">
+                <button class="btn btn-outline btn-sm" @click="scanForProduct"><i class="fas fa-camera"></i> سکان بۆ دۆزینەوە</button>
+                <span v-if="scannedProduct" class="barcode-badge" style="margin-right:8px;">{{ scannedProduct }}</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-list"></i> لیستی بەرهەمەکان</div>
+            <div v-if="products.length === 0" class="empty-state">هیچ بەرهەمێک نییە</div>
+            <div v-for="(p, idx) in products" :key="idx" class="list-item">
+                <div class="info">
+                    <strong>{{ p.name }}</strong>
+                    <span>{{ p.barcode }} | نرخ: {{ p.price }} د.ع | کۆتایی: {{ p.expiry || '—' }}</span>
+                </div>
+                <div>
+                    <button class="btn btn-danger btn-sm" @click="deleteProduct(idx)" style="width:auto; padding:4px 10px;"><i class="fas fa-trash"></i></button>
+                    <button class="btn btn-outline btn-sm" @click="editProduct(idx)" style="width:auto; padding:4px 10px;"><i class="fas fa-pen"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========= TAB 3: داهات و هەموو وەسڵەکان ========= -->
+    <div id="tab-reports" class="tab-content">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-coins"></i> داهاتی ڕۆژانە و مانگانە</div>
+            <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                <div style="background:#eef2ff; padding:16px; border-radius:24px; flex:1; min-width:100px;">
+                    <span style="color:#475569;">ئەمڕۆ</span>
+                    <div style="font-size:24px; font-weight:700;">{{ dailyRevenue }} د.ع</div>
+                </div>
+                <div style="background:#d1fae5; padding:16px; border-radius:24px; flex:1; min-width:100px;">
+                    <span style="color:#475569;">ئەم مانگە</span>
+                    <div style="font-size:24px; font-weight:700;">{{ monthlyRevenue }} د.ع</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-receipt"></i> هەموو وەسڵەکان</div>
+            <div v-if="receipts.length === 0" class="empty-state">هیچ وەسڵێک تۆمار نەکراوە</div>
+            <div v-for="(r, idx) in receipts" :key="idx" class="list-item" style="flex-direction:column; align-items:flex-start;">
+                <div><strong>وەسڵ #{{ r.id }}</strong>  <span class="badge-success">{{ r.date }}</span></div>
+                <div style="display:flex; justify-content:space-between; width:100%;">
+                    <span>{{ r.items }} بەرهەم</span>
+                    <span><strong>{{ r.total }} د.ع</strong></span>
+                </div>
+                <div style="font-size:12px; color:#475569; width:100%; margin-top:4px;">
+                    {{ r.details }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vue & Logic -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            // بەرهەمەکان (mock)
+            products: [
+                { name: 'شیر', barcode: '628913475', price: 2500, expiry: '2026-12-31', stock: 20 },
+                { name: 'نان', barcode: '628913476', price: 800, expiry: '2026-06-30', stock: 45 },
+                { name: 'پەنیر', barcode: '628913477', price: 4200, expiry: '2026-09-15', stock: 8 }
+            ],
+            // کۆدی فرۆشتن
+            cart: [],
+            // وەسڵەکان
+            receipts: [],
+            receiptCounter: 101,
+            // فۆرمی بەرهەم
+            productForm: { name: '', barcode: '', price: '', expiry: '', stock: '' },
+            editIndex: null,
+            // سکان
+            scanInput: '',
+            scannedProduct: '',
+            // date
+            today: new Date().toISOString().slice(0,10)
+        },
+        computed: {
+            totalCartPrice() {
+                return this.cart.reduce((sum, item) => sum + Number(item.price), 0);
+            },
+            dailyRevenue() {
+                const today = new Date().toISOString().slice(0,10);
+                return this.receipts.filter(r => r.date === today)
+                    .reduce((sum, r) => sum + Number(r.total), 0);
+            },
+            monthlyRevenue() {
+                const month = new Date().toISOString().slice(0,7);
+                return this.receipts.filter(r => r.date.startsWith(month))
+                    .reduce((sum, r) => sum + Number(r.total), 0);
+            }
+        },
+        methods: {
+            // ---- فرۆشتن ----
+            addToCartByCode() {
+                const code = this.scanInput.trim();
+                if (!code) { alert('تکایە باڕکۆد یان ناو بنوسە'); return; }
+                // بەدوای بەرهەم دا بگەرێ بە ناو یان باڕکۆد
+                const product = this.products.find(p => 
+                    p.barcode === code || p.name.toLowerCase().includes(code.toLowerCase())
+                );
+                if (product) {
+                    this.cart.push({ 
+                        name: product.name, 
+                        barcode: product.barcode, 
+                        price: product.price 
+                    });
+                    this.scanInput = '';
+                } else {
+                    // ئەگەر نەدۆزرایەوە، بە ناوی دەستکاری بکە
+                    const newItem = { name: code, barcode: 'unknown', price: 0 };
+                    this.cart.push(newItem);
+                    this.scanInput = '';
+                }
+            },
+            removeFromCart(index) {
+                this.cart.splice(index, 1);
+            },
+            finalizeSale() {
+                if (this.cart.length === 0) return;
+                const total = this.cart.reduce((sum, i) => sum + Number(i.price), 0);
+                const details = this.cart.map(i => `${i.name} (${i.price}د.ع)`).join('، ');
+                const receipt = {
+                    id: this.receiptCounter++,
+                    date: new Date().toISOString().slice(0,10),
+                    items: this.cart.length,
+                    total: total,
+                    details: details
+                };
+                this.receipts.unshift(receipt);
+                // کۆگا کەم بکەوە (ئاراستە)
+                this.cart.forEach(cartItem => {
+                    const prod = this.products.find(p => p.barcode === cartItem.barcode);
+                    if (prod && prod.stock > 0) prod.stock -= 1;
+                });
+                this.cart = [];
+                alert(`وەسڵ #${receipt.id} تۆمار کرا! کۆی گشتی ${total} د.ع`);
+            },
+            simulateScan() {
+                // سیمولەیشن - بەرهەمی هەڕەمەکی زیاد دەکات
+                const randomProduct = this.products[Math.floor(Math.random() * this.products.length)];
+                if (randomProduct) {
+                    this.cart.push({ 
+                        name: randomProduct.name, 
+                        barcode: randomProduct.barcode, 
+                        price: randomProduct.price 
+                    });
+                } else {
+                    alert('هیچ بەرهەمێک نییە بۆ سکان');
+                }
+            },
+            addByImage() {
+                // شێوەسازی وێنە (هەڵبژاردن)
+                const mockBarcode = prompt('کۆدی باڕکۆد لە وێنەکە دابنێ (یان ناوی بەرهەم)');
+                if (mockBarcode) {
+                    this.scanInput = mockBarcode;
+                    this.addToCartByCode();
+                }
+            },
+            // ---- بەرهەمەکان ----
+            addOrUpdateProduct() {
+                const { name, barcode, price, expiry, stock } = this.productForm;
+                if (!name || !barcode || !price) {
+                    alert('تکایە ناو، باڕکۆد و نرخ پڕ بکەوە');
+                    return;
+                }
+                const newProd = { 
+                    name, barcode, price: Number(price), 
+                    expiry: expiry || '', 
+                    stock: Number(stock) || 0 
+                };
+                if (this.editIndex !== null) {
+                    this.products.splice(this.editIndex, 1, newProd);
+                    this.editIndex = null;
+                } else {
+                    this.products.push(newProd);
+                }
+                this.productForm = { name: '', barcode: '', price: '', expiry: '', stock: '' };
+            },
+            editProduct(index) {
+                const p = this.products[index];
+                this.productForm = { 
+                    name: p.name, barcode: p.barcode, price: p.price, 
+                    expiry: p.expiry || '', stock: p.stock 
+                };
+                this.editIndex = index;
+            },
+            deleteProduct(index) {
+                if (confirm('دڵنیای لە سڕینەوەی ئەم بەرهەمە؟')) {
+                    this.products.splice(index, 1);
+                    if (this.editIndex === index) this.editIndex = null;
+                }
+            },
+            scanForProduct() {
+                const code = prompt('باڕکۆد یان ناوی بەرهەم بنوسە بۆ گەڕان');
+                if (code) {
+                    const found = this.products.find(p => p.barcode === code || p.name.includes(code));
+                    if (found) {
+                        this.scannedProduct = found.barcode;
+                        this.productForm.name = found.name;
+                        this.productForm.barcode = found.barcode;
+                        this.productForm.price = found.price;
+                        this.productForm.expiry = found.expiry || '';
+                        this.productForm.stock = found.stock;
+                    } else {
+                        alert('بەرهەم نەدۆزرایەوە');
+                    }
+                }
+            },
+            // ---- گەڕان بە تاب ----
+            switchTab(tabId) {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+                document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+            }
+        },
+        mounted() {
+            // گوێگرتن بۆ کلیکی تابەکان
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tab = btn.dataset.tab;
+                    this.switchTab(tab);
+                });
+            });
+        }
+    });
+</script>
+</body>
+</html>
