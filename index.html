@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="ckb">
+<html lang="ckb" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>سیستەمی مارکێت - پیشکەش</title>
+    <title>سیستەمی مارکێت</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <!-- QuaggaJS - باشترە بۆ باڕکۆد -->
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -24,6 +26,10 @@
             position: fixed;
             top: 0;
             left: 0;
+        }
+        
+        body {
+            direction: rtl;
         }
         
         .app-container {
@@ -202,6 +208,7 @@
             outline: none;
             transition: 0.15s;
             -webkit-appearance: none;
+            text-align: right;
         }
         input:focus {
             border-color: #2563eb;
@@ -265,10 +272,10 @@
             background: #2563eb;
             color: white;
             border: none;
-            padding: 12px;
+            padding: 14px;
             border-radius: 16px;
             font-weight: 700;
-            font-size: 15px;
+            font-size: 16px;
             width: 100%;
             display: flex;
             align-items: center;
@@ -290,7 +297,7 @@
             cursor: not-allowed;
         }
         
-        /* Simple Scanner - using input file as fallback */
+        /* Scanner Modal - Quagga */
         .scanner-modal {
             position: fixed;
             top: 0;
@@ -308,7 +315,7 @@
         .scanner-modal .close-btn {
             position: absolute;
             top: 16px;
-            right: 16px;
+            left: 16px;
             background: rgba(255,255,255,0.15);
             color: white;
             border: none;
@@ -339,29 +346,18 @@
             border-radius: 16px;
             position: relative;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .scanner-modal .scan-box video {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 16px;
         }
-        .scanner-modal .scan-box .placeholder {
-            color: #64748b;
-            text-align: center;
-            padding: 20px;
-        }
-        .scanner-modal .scan-box .placeholder i {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 12px;
-            color: #475569;
-        }
-        .scanner-modal .scan-box .placeholder p {
-            font-size: 14px;
+        .scanner-modal .scan-box canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
         .scanner-modal .scan-box .overlay {
             position: absolute;
@@ -374,6 +370,7 @@
             border-radius: 12px;
             pointer-events: none;
             box-shadow: 0 0 0 4000px rgba(0,0,0,0.35);
+            z-index: 5;
         }
         .scanner-modal .scan-box .overlay .scan-line {
             position: absolute;
@@ -415,14 +412,19 @@
         }
         .scanner-modal .result-barcode {
             background: rgba(255,255,255,0.1);
-            padding: 6px 16px;
+            padding: 8px 20px;
             border-radius: 40px;
             color: #facc15;
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 20px;
             margin-top: 8px;
             font-family: monospace;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            direction: ltr;
+        }
+        .scanner-modal .result-barcode .check {
+            color: #22c55e;
+            margin-left: 8px;
         }
         .scanner-modal .btn-stop {
             margin-top: 14px;
@@ -556,9 +558,10 @@
             display: inline-block;
             font-weight: 600;
             color: #facc15;
-            font-size: 13px;
+            font-size: 16px;
             margin-top: 6px;
             font-family: monospace;
+            direction: ltr;
         }
         
         .quick-scan-indicator {
@@ -602,7 +605,7 @@
                 </div>
                 <div v-if="lastScannedCode" class="quick-scan-indicator">
                     <i class="fas fa-check-circle"></i>
-                    دوایین سکان: {{ lastScannedCode }}
+                    دوایین سکان: <span style="font-family:monospace;direction:ltr;display:inline-block;">{{ lastScannedCode }}</span>
                 </div>
             </div>
 
@@ -688,7 +691,7 @@
                 <div v-for="(p, idx) in products" :key="idx" class="list-item">
                     <div class="info">
                         <strong>{{ p.name }}</strong>
-                        <span style="font-size:10px; color:#64748b;">{{ p.barcode }} | {{ p.price }} د.ع</span>
+                        <span style="font-size:10px; color:#64748b;direction:ltr;display:inline-block;">{{ p.barcode }} | {{ p.price }} د.ع</span>
                     </div>
                     <div style="display:flex; gap:3px;">
                         <button class="btn btn-danger btn-sm" @click="deleteProduct(idx)" style="padding:3px 8px;"><i class="fas fa-trash"></i></button>
@@ -749,7 +752,7 @@
         </button>
     </div>
 
-    <!-- Scanner Modal -->
+    <!-- Scanner Modal - Quagga -->
     <div v-if="showScanner" class="scanner-modal">
         <button class="close-btn" @click="stopScanner">✕</button>
         <div class="title"><i class="fas fa-camera"></i> سکانی باڕکۆد</div>
@@ -763,7 +766,7 @@
             <span>{{ scannerStatus }}</span>
         </div>
         <div v-if="scannedBarcode" class="result-barcode">
-            ✅ {{ scannedBarcode }}
+            <span class="check">✅</span> {{ scannedBarcode }}
         </div>
         <button class="btn-stop" @click="stopScanner">
             <i class="fas fa-times"></i> داخستن
@@ -776,8 +779,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-<!-- Use a simpler barcode reader library -->
-<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.js"></script>
 <script>
     new Vue({
         el: '#app',
@@ -799,9 +800,7 @@
             scannerMode: 'sales',
             currentDate: new Date().toISOString().slice(0,10),
             isScanning: false,
-            scannerStatus: 'چاوەڕوانی سکان...',
-            codeReader: null,
-            scanAttempts: 0
+            scannerStatus: 'چاوەڕوانی سکان...'
         },
         computed: {
             totalCartPrice() {
@@ -819,103 +818,89 @@
             }
         },
         methods: {
-            // ===== Scanner =====
-            async startScanner(mode) {
+            // ===== Quagga Scanner =====
+            startScanner(mode) {
                 this.scannerMode = mode;
                 this.showScanner = true;
                 this.scannedBarcode = '';
                 this.isScanning = true;
                 this.scannerStatus = 'کامێرا دەکاتەوە...';
-                this.scanAttempts = 0;
                 
-                try {
-                    // First check if camera is available
-                    const devices = await navigator.mediaDevices.enumerateDevices();
-                    const hasCamera = devices.some(d => d.kind === 'videoinput');
-                    
-                    if (!hasCamera) {
-                        this.scannerStatus = '⚠️ هیچ کامێرایەک نەدۆزرایەوە';
-                        this.isScanning = false;
-                        alert('⚠️ هیچ کامێرایەک نەدۆزرایەوە لەم ئامێرەدا. تکایە بە نوسین باڕکۆدەکە بنوسە.');
-                        return;
-                    }
-                    
-                    // Create video element
-                    let video = document.querySelector('#scanBox video');
-                    if (!video) {
-                        video = document.createElement('video');
-                        video.setAttribute('autoplay', '');
-                        video.setAttribute('playsinline', '');
-                        video.setAttribute('muted', '');
-                        document.querySelector('#scanBox').appendChild(video);
-                    }
-                    
-                    // Get camera stream
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { 
-                            facingMode: 'environment',
+                // Clear any previous video
+                const scanBox = document.getElementById('scanBox');
+                const oldVideo = scanBox.querySelector('video');
+                if (oldVideo) oldVideo.remove();
+                const oldCanvas = scanBox.querySelector('canvas');
+                if (oldCanvas) oldCanvas.remove();
+                
+                // Configure Quagga
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: scanBox,
+                        constraints: {
+                            facingMode: "environment",
                             width: { ideal: 640 },
                             height: { ideal: 480 }
                         }
-                    });
-                    
-                    video.srcObject = stream;
-                    await video.play();
+                    },
+                    decoder: {
+                        readers: [
+                            "ean_reader",
+                            "ean_8_reader",
+                            "code_128_reader",
+                            "code_39_reader",
+                            "upc_reader"
+                        ],
+                        multiple: false
+                    },
+                    locate: true
+                }, (err) => {
+                    if (err) {
+                        console.error('Quagga init error:', err);
+                        this.scannerStatus = '⚠️ هەڵەی کامێرا';
+                        this.isScanning = false;
+                        alert('⚠️ ناتوانێت کامێرا بکاتەوە. تکایە ڕێگەپێدان بدە یان بە نوسین بنوسە.');
+                        return;
+                    }
                     
                     this.scannerStatus = 'چاوەڕوانی سکان...';
+                    Quagga.start();
+                });
+                
+                // On detected
+                Quagga.onDetected((result) => {
+                    if (!this.isScanning) return;
                     
-                    // Initialize ZXing reader
-                    if (!this.codeReader) {
-                        this.codeReader = new ZXing.BrowserMultiFormatReader();
-                    }
+                    const code = result.codeResult.code;
+                    if (!code) return;
                     
-                    // Start decoding
-                    this.codeReader.decodeFromVideoElement(video, (result, err) => {
-                        if (result && this.isScanning) {
-                            const code = result.getText();
-                            this.scannedBarcode = code;
-                            this.lastScannedCode = code;
-                            this.scannerStatus = '✅ سکان کرا!';
-                            
-                            if (navigator.vibrate) navigator.vibrate(50);
-                            
-                            // Handle based on mode
-                            if (this.scannerMode === 'sales') {
-                                this.scanInput = code;
-                                this.addToCartByCode();
-                                // Reset for next scan after 1 second
-                                setTimeout(() => {
-                                    this.scannedBarcode = '';
-                                    if (this.showScanner && this.isScanning) {
-                                        this.scannerStatus = 'چاوەڕوانی سکان...';
-                                    }
-                                }, 1200);
-                            } else {
-                                // Products mode
-                                this.findProductByBarcode(code);
-                                setTimeout(() => {
-                                    this.scannedBarcode = '';
-                                    if (this.showScanner && this.isScanning) {
-                                        this.scannerStatus = 'چاوەڕوانی سکان...';
-                                    }
-                                }, 1500);
+                    this.scannedBarcode = code;
+                    this.lastScannedCode = code;
+                    this.scannerStatus = '✅ سکان کرا!';
+                    
+                    if (navigator.vibrate) navigator.vibrate(50);
+                    
+                    if (this.scannerMode === 'sales') {
+                        this.scanInput = code;
+                        this.addToCartByCode();
+                        setTimeout(() => {
+                            this.scannedBarcode = '';
+                            if (this.showScanner && this.isScanning) {
+                                this.scannerStatus = 'چاوەڕوانی سکان...';
                             }
-                        }
-                    });
-                    
-                } catch (error) {
-                    console.error('Scanner error:', error);
-                    this.isScanning = false;
-                    this.scannerStatus = '⚠️ هەڵەی کامێرا';
-                    
-                    if (error.name === 'NotAllowedError') {
-                        alert('⚠️ ڕێگەپێدان بۆ کامێرا نەدراوە. تکایە ڕێگەپێدان بدە و دووبارە هەوڵبدەوە.');
-                    } else if (error.name === 'NotFoundError') {
-                        alert('⚠️ هیچ کامێرایەک نەدۆزرایەوە. تکایە بە نوسین باڕکۆدەکە بنوسە.');
+                        }, 1200);
                     } else {
-                        alert('⚠️ کێشە لە کردنەوەی کامێرا. تکایە بە نوسین باڕکۆدەکە بنوسە.');
+                        this.findProductByBarcode(code);
+                        setTimeout(() => {
+                            this.scannedBarcode = '';
+                            if (this.showScanner && this.isScanning) {
+                                this.scannerStatus = 'چاوەڕوانی سکان...';
+                            }
+                        }, 1500);
                     }
-                }
+                });
             },
             
             stopScanner() {
@@ -923,18 +908,16 @@
                 this.showScanner = false;
                 this.scannedBarcode = '';
                 
-                const video = document.querySelector('#scanBox video');
-                if (video && video.srcObject) {
-                    try {
-                        video.srcObject.getTracks().forEach(track => track.stop());
-                        video.srcObject = null;
-                    } catch(e) {}
-                }
+                try {
+                    Quagga.stop();
+                } catch(e) {}
                 
-                if (this.codeReader) {
-                    try {
-                        this.codeReader.reset();
-                    } catch(e) {}
+                // Clean up video
+                const scanBox = document.getElementById('scanBox');
+                const video = scanBox.querySelector('video');
+                if (video && video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                    video.srcObject = null;
                 }
             },
             
@@ -949,7 +932,6 @@
                     this.scannerStatus = '✅ بەرهەم دۆزرایەوە!';
                 } else {
                     this.productForm.barcode = code;
-                    // Try to find by name match
                     const byName = this.products.find(p => p.name.includes(code) || code.includes(p.name));
                     if (byName) {
                         this.productForm.name = byName.name;
@@ -958,7 +940,7 @@
                         this.productForm.stock = byName.stock;
                         this.scannerStatus = '✅ بەرهەم دۆزرایەوە!';
                     } else {
-                        this.scannerStatus = '⚠️ بەرهەم نەدۆزرایەوە، باڕکۆدەکە تۆمارکرا';
+                        this.scannerStatus = '⚠️ بەرهەم نەدۆزرایەوە';
                     }
                 }
             },
@@ -966,12 +948,13 @@
             manualBarcodeEntry() {
                 const code = prompt('تکایە ژمارەی باڕکۆدەکە بنوسە:');
                 if (code && code.trim()) {
+                    const cleanCode = code.trim();
                     if (this.scannerMode === 'sales') {
-                        this.scanInput = code.trim();
+                        this.scanInput = cleanCode;
                         this.addToCartByCode();
                         this.stopScanner();
                     } else {
-                        this.findProductByBarcode(code.trim());
+                        this.findProductByBarcode(cleanCode);
                         setTimeout(() => this.stopScanner(), 1500);
                     }
                 }
