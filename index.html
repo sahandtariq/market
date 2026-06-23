@@ -6,9 +6,9 @@
     <title>سیستەمی مارکێت - پیشکەش</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <!-- ZXing for barcode scanning -->
     <script src="https://unpkg.com/@zxing/library@0.18.6/umd/index.js"></script>
     <style>
-        /* Reset and Base */
         * {
             margin: 0;
             padding: 0;
@@ -16,25 +16,17 @@
             font-family: 'Inter', sans-serif;
         }
         
-        /* Prevent zoom on mobile */
         html, body {
             touch-action: manipulation;
             -webkit-text-size-adjust: 100%;
             -moz-text-size-adjust: 100%;
             -ms-text-size-adjust: 100%;
             text-size-adjust: 100%;
-        }
-        
-        body {
             background: #f0f4f8;
-            display: flex;
-            justify-content: center;
-            padding: 0;
-            direction: rtl;
             height: 100vh;
             overflow: hidden;
-            position: fixed;
             width: 100%;
+            position: fixed;
             top: 0;
             left: 0;
         }
@@ -48,6 +40,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            margin: 0 auto;
         }
         
         /* Header */
@@ -55,7 +48,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 18px 12px;
+            padding: 14px 18px 10px;
             background: white;
             border-bottom: 1px solid #e9eef3;
             flex-shrink: 0;
@@ -77,38 +70,33 @@
             border-radius: 14px;
         }
         
-        /* Content Area - Scrollable */
+        /* Content */
         .content-area {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 16px 18px 100px;
+            padding: 12px 16px 80px;
             -webkit-overflow-scrolling: touch;
         }
-        
-        /* Hide scrollbar */
         .content-area::-webkit-scrollbar {
-            width: 4px;
-        }
-        .content-area::-webkit-scrollbar-track {
-            background: transparent;
+            width: 3px;
         }
         .content-area::-webkit-scrollbar-thumb {
             background: #d1d9e6;
             border-radius: 10px;
         }
         
-        /* Tab Content */
+        /* Tabs */
         .tab-content {
             display: none;
-            animation: fade 0.25s ease;
+            animation: fade 0.2s ease;
         }
         .tab-content.active {
             display: block;
         }
         @keyframes fade { 
-            from { opacity: 0.3; transform: translateY(6px); } 
-            to { opacity: 1; transform: translateY(0); } 
+            from { opacity: 0.3; } 
+            to { opacity: 1; } 
         }
         
         /* Bottom Navigation */
@@ -124,41 +112,38 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 8px 0 env(safe-area-inset-bottom);
+            padding: 6px 0 env(safe-area-inset-bottom);
             z-index: 100;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
-            height: 68px;
+            height: 64px;
         }
         .bottom-nav .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 1px;
             background: transparent;
             border: none;
             color: #94a3b8;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 500;
             cursor: pointer;
             padding: 4px 12px;
             transition: 0.2s;
             position: relative;
-            min-width: 60px;
+            min-width: 50px;
+            touch-action: manipulation;
         }
         .bottom-nav .nav-item i {
-            font-size: 22px;
+            font-size: 20px;
             transition: 0.2s;
         }
         .bottom-nav .nav-item span {
-            font-size: 10px;
-            transition: 0.2s;
+            font-size: 9px;
         }
         .bottom-nav .nav-item.active {
             color: #2563eb;
-        }
-        .bottom-nav .nav-item.active i {
-            transform: scale(1.05);
         }
         .bottom-nav .nav-item.active::after {
             content: '';
@@ -171,64 +156,61 @@
             background: #2563eb;
             border-radius: 0 0 4px 4px;
         }
-        .bottom-nav .nav-item:active {
-            transform: scale(0.92);
-        }
         .bottom-nav .nav-item .badge {
             position: absolute;
             top: 0;
-            right: 4px;
+            right: 2px;
             background: #dc2626;
             color: white;
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 700;
-            padding: 1px 6px;
+            padding: 1px 5px;
             border-radius: 20px;
-            min-width: 16px;
+            min-width: 14px;
             text-align: center;
         }
         
         /* Cards */
         .card {
             background: white;
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 16px;
+            border-radius: 18px;
+            padding: 14px;
+            margin-bottom: 14px;
             border: 1px solid #e9eef3;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         .card-title {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
             color: #0f172a;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
         .card-title i {
             color: #2563eb;
-            width: 20px;
-            font-size: 16px;
+            width: 18px;
+            font-size: 15px;
         }
         
         /* Inputs */
         .flex-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
         .flex-row .grow {
             flex: 1;
-            min-width: 100px;
+            min-width: 90px;
         }
-        input, select {
+        input {
             width: 100%;
-            padding: 10px 14px;
+            padding: 8px 12px;
             border: 1px solid #d1d9e6;
-            border-radius: 16px;
+            border-radius: 14px;
             background: white;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
             transition: 0.15s;
             -webkit-appearance: none;
@@ -236,7 +218,7 @@
         }
         input:focus {
             border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
         }
         input[type="number"] {
             -moz-appearance: textfield;
@@ -252,26 +234,26 @@
             background: #2563eb;
             color: white;
             border: none;
-            padding: 10px 18px;
+            padding: 8px 16px;
             border-radius: 40px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             cursor: pointer;
             transition: 0.15s;
             width: 100%;
             touch-action: manipulation;
+            white-space: nowrap;
         }
-        .btn:active { transform: scale(0.96); }
+        .btn:active { transform: scale(0.95); }
         .btn-outline {
             background: transparent;
             border: 2px solid #2563eb;
             color: #2563eb;
         }
-        .btn-outline i { color: #2563eb; }
         .btn-success {
             background: #0b8a4b;
         }
@@ -279,9 +261,9 @@
             background: #dc2626;
         }
         .btn-sm {
-            padding: 6px 12px;
+            padding: 5px 10px;
             width: auto;
-            font-size: 12px;
+            font-size: 11px;
         }
         .btn-warning {
             background: #f59e0b;
@@ -292,8 +274,40 @@
             cursor: not-allowed;
             transform: none;
         }
+        .btn-success:disabled {
+            opacity: 0.5;
+        }
         
-        /* Scanner */
+        /* Scanner Button - Large & Prominent */
+        .scan-btn-large {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 15px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            touch-action: manipulation;
+        }
+        .scan-btn-large:active {
+            transform: scale(0.96);
+        }
+        .scan-btn-large i {
+            font-size: 22px;
+        }
+        .scan-btn-large.warning {
+            background: #f59e0b;
+            color: #0f172a;
+        }
+        
+        /* Scanner Modal - Full Screen */
         .scanner-modal {
             position: fixed;
             top: 0;
@@ -302,33 +316,43 @@
             height: 100%;
             z-index: 9999;
             background: #0f172a;
-            padding: 40px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
         .scanner-modal .close-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: transparent;
+            top: 16px;
+            right: 16px;
+            background: rgba(255,255,255,0.15);
             color: white;
             border: none;
-            font-size: 32px;
+            font-size: 28px;
             cursor: pointer;
             z-index: 20;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .scanner-modal .close-btn:active {
+            transform: scale(0.9);
         }
         .scanner-modal .title {
             color: white;
-            font-size: 18px;
-            margin-bottom: 16px;
+            font-size: 17px;
+            margin-bottom: 12px;
+            font-weight: 600;
         }
         .scanner-modal .scan-box {
             width: 100%;
-            max-width: 350px;
+            max-width: 380px;
             aspect-ratio: 4/3;
-            background: #1e293b;
+            background: #1a2332;
             border-radius: 16px;
             position: relative;
             overflow: hidden;
@@ -343,89 +367,143 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 70%;
-            height: 50%;
-            border: 3px solid rgba(37, 99, 235, 0.6);
+            width: 75%;
+            height: 55%;
+            border: 2px solid rgba(37, 99, 235, 0.5);
             border-radius: 12px;
             pointer-events: none;
-            box-shadow: 0 0 0 4000px rgba(0,0,0,0.3);
+            box-shadow: 0 0 0 4000px rgba(0,0,0,0.35);
         }
-        .scanner-modal .scan-box .overlay::after {
-            content: '';
+        .scanner-modal .scan-box .overlay .corner {
             position: absolute;
-            top: -2px;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: #2563eb;
-            animation: scanLine 2s linear infinite;
+            width: 16px;
+            height: 16px;
+            border-color: #2563eb;
+            border-style: solid;
+            border-width: 0;
         }
-        @keyframes scanLine {
-            0% { top: -2px; }
-            100% { top: 100%; }
+        .scanner-modal .scan-box .overlay .corner.tl {
+            top: -2px;
+            left: -2px;
+            border-top-width: 3px;
+            border-left-width: 3px;
+            border-radius: 4px 0 0 0;
+        }
+        .scanner-modal .scan-box .overlay .corner.tr {
+            top: -2px;
+            right: -2px;
+            border-top-width: 3px;
+            border-right-width: 3px;
+            border-radius: 0 4px 0 0;
+        }
+        .scanner-modal .scan-box .overlay .corner.bl {
+            bottom: -2px;
+            left: -2px;
+            border-bottom-width: 3px;
+            border-left-width: 3px;
+            border-radius: 0 0 0 4px;
+        }
+        .scanner-modal .scan-box .overlay .corner.br {
+            bottom: -2px;
+            right: -2px;
+            border-bottom-width: 3px;
+            border-right-width: 3px;
+            border-radius: 0 0 4px 0;
+        }
+        .scanner-modal .scan-box .overlay .scan-line {
+            position: absolute;
+            top: 0;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background: #2563eb;
+            animation: scanMove 2s ease-in-out infinite;
+            box-shadow: 0 0 10px #2563eb;
+        }
+        @keyframes scanMove {
+            0% { top: 5%; }
+            50% { top: 90%; }
+            100% { top: 5%; }
         }
         .scanner-modal .status {
             color: #94a3b8;
-            margin-top: 14px;
+            margin-top: 12px;
             font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .scanner-modal .status i {
-            color: #22c55e;
+        .scanner-modal .status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: blink 1s infinite;
         }
-        .scanner-modal .result {
-            background: #1e293b;
-            padding: 8px 18px;
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+        .scanner-modal .result-barcode {
+            background: rgba(255,255,255,0.1);
+            padding: 6px 16px;
             border-radius: 40px;
             color: #facc15;
             font-weight: 600;
-            font-size: 15px;
-            margin-top: 10px;
+            font-size: 16px;
+            margin-top: 8px;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        .scanner-modal .result-barcode .check {
+            color: #22c55e;
+            margin-right: 6px;
         }
         .scanner-modal .btn-stop {
-            margin-top: 16px;
-            background: transparent;
-            border: 2px solid white;
+            margin-top: 14px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             color: white;
             padding: 10px 28px;
             border-radius: 40px;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
+            touch-action: manipulation;
         }
-        .btn-stop:active { transform: scale(0.96); }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
+        .scanner-modal .btn-stop:active {
+            transform: scale(0.95);
         }
-        .pulse {
-            animation: pulse 1.5s infinite;
+        .scanner-modal .hint {
+            color: #64748b;
+            font-size: 11px;
+            margin-top: 8px;
         }
         
         /* Receipt */
         .receipt-paper {
             background: white;
             border-radius: 14px;
-            padding: 16px;
+            padding: 14px;
             border: 2px solid #e9eef3;
         }
         .receipt-header {
             text-align: center;
             border-bottom: 2px dashed #d1d9e6;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
         }
         .receipt-header h3 {
             color: #0f172a;
-            font-size: 16px;
+            font-size: 15px;
         }
         .receipt-header p {
             color: #64748b;
-            font-size: 12px;
+            font-size: 11px;
         }
         .receipt-item {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
+            padding: 5px 0;
             border-bottom: 1px dashed #e9eef3;
             font-size: 13px;
         }
@@ -434,86 +512,100 @@
         .receipt-total {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0 6px;
+            padding: 10px 0 4px;
             border-top: 2px solid #0f172a;
-            margin-top: 6px;
+            margin-top: 4px;
             font-weight: 700;
-            font-size: 17px;
+            font-size: 16px;
         }
-        .receipt-total .total-label { color: #0f172a; }
-        .receipt-total .total-price { color: #2563eb; }
         .receipt-footer {
             text-align: center;
             color: #94a3b8;
-            font-size: 11px;
-            margin-top: 10px;
+            font-size: 10px;
+            margin-top: 8px;
             border-top: 2px dashed #d1d9e6;
-            padding-top: 10px;
+            padding-top: 8px;
         }
         
-        /* List Items */
         .list-item {
             background: white;
-            border-radius: 14px;
-            padding: 10px 14px;
-            margin-bottom: 8px;
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
             border: 1px solid #e9eef3;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .list-item .info { font-size: 13px; }
-        .list-item .info strong { display: block; font-size: 15px; color: #0f172a; }
-        .badge-success { background: #d1fae5; color: #065f46; padding: 3px 10px; border-radius: 40px; font-size: 12px; }
+        .list-item .info { font-size: 12px; }
+        .list-item .info strong { display: block; font-size: 14px; color: #0f172a; }
+        .badge-success { background: #d1fae5; color: #065f46; padding: 2px 10px; border-radius: 40px; font-size: 11px; }
         
         .total-box {
             background: #1e293b;
             color: white;
-            border-radius: 20px;
-            padding: 14px;
-            margin-top: 10px;
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 8px;
             display: flex;
             justify-content: space-between;
-            font-size: 17px;
+            font-size: 16px;
         }
         .empty-state {
             text-align: center;
             color: #94a3b8;
-            padding: 24px 0;
+            padding: 18px 0;
+            font-size: 13px;
         }
-        .empty-state i { opacity: 0.4; margin-bottom: 6px; }
-        .mt-2 { margin-top: 10px; }
-        .mb-2 { margin-bottom: 10px; }
-        .gap-2 { gap: 6px; }
+        .empty-state i { opacity: 0.4; margin-bottom: 4px; font-size: 22px; }
+        .mt-2 { margin-top: 8px; }
+        .mb-2 { margin-bottom: 8px; }
         .text-center { text-align: center; }
         .hidden { display: none; }
+        .gap-1 { gap: 4px; }
         
-        /* Stats */
         .stat-card {
             background: #eef2ff;
-            padding: 14px;
-            border-radius: 18px;
+            padding: 12px;
+            border-radius: 16px;
             flex: 1;
-            min-width: 90px;
+            min-width: 80px;
         }
-        .stat-card .label { color: #475569; font-size: 12px; }
-        .stat-card .value { font-size: 22px; font-weight: 700; color: #0f172a; }
+        .stat-card .label { color: #475569; font-size: 11px; }
+        .stat-card .value { font-size: 20px; font-weight: 700; color: #0f172a; }
         .stat-card.green { background: #d1fae5; }
         .stat-card.green .value { color: #065f46; }
         
-        /* Barcode result */
         .barcode-result {
             background: #1e293b;
-            padding: 8px 14px;
+            padding: 6px 14px;
             border-radius: 40px;
             display: inline-block;
             font-weight: 600;
             color: #facc15;
-            font-size: 14px;
+            font-size: 13px;
             margin-top: 6px;
+            font-family: monospace;
         }
         
-        /* Safe area for bottom nav */
+        /* Quick scan indicator */
+        .quick-scan-indicator {
+            background: #dcfce7;
+            color: #065f46;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .quick-scan-indicator i {
+            color: #22c55e;
+            animation: pulse 1s infinite;
+        }
+        
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
             .bottom-nav {
                 padding-bottom: env(safe-area-inset-bottom);
@@ -529,25 +621,24 @@
         <i class="fas fa-qrcode"></i>
     </div>
 
-    <!-- Content Area -->
+    <!-- Content -->
     <div class="content-area" id="contentArea">
-        <!-- ========= TAB 1: فرۆشتن ========= -->
+        <!-- TAB 1: فرۆشتن -->
         <div id="tab-sales" class="tab-content active">
             <div class="card">
-                <div class="card-title"><i class="fas fa-cart-plus"></i> زیادکردن بۆ سەبەتە</div>
-                <div class="flex-row">
-                    <div class="grow">
-                        <input type="text" placeholder="باڕکۆد یان ناو..." v-model="scanInput" @keyup.enter="addToCartByCode">
-                    </div>
-                    <button class="btn btn-sm" @click="addToCartByCode"><i class="fas fa-plus"></i> زیاد</button>
+                <div class="card-title"><i class="fas fa-camera"></i> سکان و فرۆشتن</div>
+                <!-- Large Scan Button -->
+                <button class="scan-btn-large" @click="startScanner('sales')">
+                    <i class="fas fa-camera"></i>
+                    کلیک بکە بۆ سکانی باڕکۆد
+                </button>
+                <div style="margin-top:8px; display:flex; gap:6px;">
+                    <input type="text" placeholder="یان بە نوسین..." v-model="scanInput" @keyup.enter="addToCartByCode" style="flex:1;">
+                    <button class="btn btn-sm" @click="addToCartByCode" style="width:auto; padding:8px 14px;"><i class="fas fa-plus"></i></button>
                 </div>
-                <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
-                    <button class="btn btn-warning btn-sm" @click="startScanner('sales')">
-                        <i class="fas fa-camera"></i> سکان
-                    </button>
-                    <button class="btn btn-outline btn-sm" @click="addByImage">
-                        <i class="fas fa-image"></i> وێنە
-                    </button>
+                <div v-if="lastScannedCode" class="quick-scan-indicator">
+                    <i class="fas fa-check-circle"></i>
+                    دوایین سکان: {{ lastScannedCode }}
                 </div>
             </div>
 
@@ -558,22 +649,20 @@
                         <h3>🏪 مارکێتHub</h3>
                         <p>{{ currentDate }} | وەسڵ #{{ receiptCounter-1 }}</p>
                     </div>
-                    <div id="cartItems">
-                        <div v-if="cart.length === 0" class="empty-state">
-                            <i class="fas fa-shopping-cart" style="font-size:24px;"></i>
-                            <p style="font-size:13px;">هیچ بەرهەمێک نییە</p>
-                        </div>
-                        <div v-for="(item, idx) in cart" :key="idx" class="receipt-item">
-                            <span class="name">{{ item.name }}</span>
-                            <span class="price">{{ item.price }} د.ع</span>
-                        </div>
+                    <div v-if="cart.length === 0" class="empty-state">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>هیچ بەرهەمێک نییە</p>
+                    </div>
+                    <div v-for="(item, idx) in cart" :key="idx" class="receipt-item">
+                        <span class="name">{{ item.name }}</span>
+                        <span class="price">{{ item.price }} د.ع</span>
                     </div>
                     <div class="receipt-total">
-                        <span class="total-label">کۆی گشتی</span>
-                        <span class="total-price">{{ totalCartPrice }} د.ع</span>
+                        <span>کۆی گشتی</span>
+                        <span>{{ totalCartPrice }} د.ع</span>
                     </div>
                     <div class="receipt-footer">
-                        <span>ژمارەی بەرهەمەکان: {{ cart.length }}</span>
+                        ژمارەی بەرهەمەکان: {{ cart.length }}
                     </div>
                 </div>
                 <button class="btn btn-success mt-2" @click="finalizeSale" :disabled="cart.length===0">
@@ -586,10 +675,10 @@
                 <div v-if="receipts.length === 0" class="empty-state">هیچ وەسڵێک نییە</div>
                 <div v-for="(r, idx) in receipts.slice(0,2)" :key="idx" class="list-item" style="flex-direction:column; align-items:flex-start;">
                     <div style="display:flex; justify-content:space-between; width:100%;">
-                        <strong style="font-size:14px;">وەسڵ #{{ r.id }}</strong>
+                        <strong style="font-size:13px;">وەسڵ #{{ r.id }}</strong>
                         <span class="badge-success">{{ r.date }}</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; width:100%; margin-top:3px; font-size:13px;">
+                    <div style="display:flex; justify-content:space-between; width:100%; margin-top:2px; font-size:12px;">
                         <span>{{ r.items }} بەرهەم</span>
                         <span><strong>{{ r.total }} د.ع</strong></span>
                     </div>
@@ -597,10 +686,15 @@
             </div>
         </div>
 
-        <!-- ========= TAB 2: بەرهەمەکان ========= -->
+        <!-- TAB 2: بەرهەمەکان -->
         <div id="tab-products" class="tab-content">
             <div class="card">
                 <div class="card-title"><i class="fas fa-box"></i> زیادکردن / دەستکاری</div>
+                <!-- Quick Scan for Products -->
+                <button class="scan-btn-large warning" @click="startScanner('products')" style="margin-bottom:8px;">
+                    <i class="fas fa-camera"></i>
+                    سکان بۆ دۆزینەوەی بەرهەم
+                </button>
                 <div class="flex-row">
                     <div class="grow">
                         <input type="text" placeholder="ناوی بەرهەم" v-model="productForm.name">
@@ -621,15 +715,7 @@
                     <input type="number" placeholder="ژمارە" v-model="productForm.stock">
                     <button class="btn btn-sm" @click="addOrUpdateProduct"><i class="fas fa-save"></i> تۆمار</button>
                 </div>
-                <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
-                    <button class="btn btn-warning btn-sm" @click="startScanner('products')">
-                        <i class="fas fa-camera"></i> سکان
-                    </button>
-                    <button class="btn btn-outline btn-sm" @click="scanByInput">
-                        <i class="fas fa-keyboard"></i> نوسین
-                    </button>
-                </div>
-                <div v-if="scannedBarcode" class="barcode-result" style="margin-top:8px;">
+                <div v-if="scannedBarcode" class="barcode-result">
                     <i class="fas fa-check-circle" style="color:#22c55e;"></i> {{ scannedBarcode }}
                 </div>
             </div>
@@ -640,21 +726,21 @@
                 <div v-for="(p, idx) in products" :key="idx" class="list-item">
                     <div class="info">
                         <strong>{{ p.name }}</strong>
-                        <span style="font-size:11px; color:#64748b;">{{ p.barcode }} | {{ p.price }} د.ع</span>
+                        <span style="font-size:10px; color:#64748b;">{{ p.barcode }} | {{ p.price }} د.ع</span>
                     </div>
-                    <div style="display:flex; gap:4px;">
-                        <button class="btn btn-danger btn-sm" @click="deleteProduct(idx)" style="padding:4px 8px;"><i class="fas fa-trash"></i></button>
-                        <button class="btn btn-outline btn-sm" @click="editProduct(idx)" style="padding:4px 8px;"><i class="fas fa-pen"></i></button>
+                    <div style="display:flex; gap:3px;">
+                        <button class="btn btn-danger btn-sm" @click="deleteProduct(idx)" style="padding:3px 8px;"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-outline btn-sm" @click="editProduct(idx)" style="padding:3px 8px;"><i class="fas fa-pen"></i></button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ========= TAB 3: داهات ========= -->
+        <!-- TAB 3: داهات -->
         <div id="tab-reports" class="tab-content">
             <div class="card">
                 <div class="card-title"><i class="fas fa-chart-simple"></i> داهات</div>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
                     <div class="stat-card">
                         <div class="label"><i class="fas fa-calendar-day"></i> ئەمڕۆ</div>
                         <div class="value">{{ dailyRevenue }} د.ع</div>
@@ -671,14 +757,14 @@
                 <div v-if="receipts.length === 0" class="empty-state">هیچ وەسڵێک تۆمار نەکراوە</div>
                 <div v-for="(r, idx) in receipts" :key="idx" class="list-item" style="flex-direction:column; align-items:flex-start;">
                     <div style="display:flex; justify-content:space-between; width:100%;">
-                        <strong style="font-size:14px;">وەسڵ #{{ r.id }}</strong>
+                        <strong style="font-size:13px;">وەسڵ #{{ r.id }}</strong>
                         <span class="badge-success">{{ r.date }}</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; width:100%; margin-top:3px; font-size:13px;">
+                    <div style="display:flex; justify-content:space-between; width:100%; margin-top:2px; font-size:12px;">
                         <span>{{ r.items }} بەرهەم</span>
                         <span><strong>{{ r.total }} د.ع</strong></span>
                     </div>
-                    <div style="font-size:11px; color:#64748b; width:100%; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <div style="font-size:10px; color:#64748b; width:100%; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         {{ r.details }}
                     </div>
                 </div>
@@ -708,21 +794,25 @@
         <button class="close-btn" @click="stopScanner">✕</button>
         <div class="title"><i class="fas fa-camera"></i> سکانی باڕکۆد</div>
         <div class="scan-box" id="scanBox">
-            <div class="overlay"></div>
+            <div class="overlay">
+                <div class="corner tl"></div>
+                <div class="corner tr"></div>
+                <div class="corner bl"></div>
+                <div class="corner br"></div>
+                <div class="scan-line"></div>
+            </div>
         </div>
         <div class="status">
-            <i class="fas fa-circle pulse"></i>
+            <span class="dot"></span>
             <span>چاوەڕوانی سکان...</span>
         </div>
-        <div v-if="scannedBarcode" class="result">
-            <i class="fas fa-check-circle" style="color:#22c55e;"></i> {{ scannedBarcode }}
+        <div v-if="scannedBarcode" class="result-barcode">
+            <span class="check">✅</span> {{ scannedBarcode }}
         </div>
         <button class="btn-stop" @click="stopScanner">
             <i class="fas fa-times"></i> داخستن
         </button>
-        <div style="color:#64748b; font-size:11px; margin-top:10px;">
-            باڕکۆدەکە بخەرە ناو چوارگۆشەکە
-        </div>
+        <div class="hint">باڕکۆدەکە بخەرە ناو چوارگۆشەکە</div>
     </div>
 </div>
 
@@ -743,11 +833,13 @@
             editIndex: null,
             scanInput: '',
             scannedBarcode: '',
+            lastScannedCode: '',
             showScanner: false,
             scannerMode: 'sales',
             currentDate: new Date().toISOString().slice(0,10),
             codeReader: null,
-            isScanning: false
+            isScanning: false,
+            scanTimeout: null
         },
         computed: {
             totalCartPrice() {
@@ -765,7 +857,7 @@
             }
         },
         methods: {
-            // ===== Scanner with ZXing =====
+            // ===== Fast Scanner =====
             async startScanner(mode) {
                 this.scannerMode = mode;
                 this.showScanner = true;
@@ -777,35 +869,49 @@
                         this.codeReader = new ZXing.BrowserMultiFormatReader();
                     }
                     
-                    const videoElement = document.querySelector('#scanBox video');
-                    
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
-                    });
-                    
-                    let video = videoElement;
+                    // Get video element
+                    let video = document.querySelector('#scanBox video');
                     if (!video) {
                         video = document.createElement('video');
                         video.setAttribute('autoplay', '');
                         video.setAttribute('playsinline', '');
+                        video.setAttribute('muted', '');
                         document.querySelector('#scanBox').appendChild(video);
                     }
+                    
+                    // Start camera
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { 
+                            facingMode: 'environment',
+                            width: { ideal: 640 },
+                            height: { ideal: 480 }
+                        }
+                    });
                     
                     video.srcObject = stream;
                     await video.play();
                     
+                    // Start decoding - continuous mode
                     this.codeReader.decodeFromVideoElement(video, (result, err) => {
                         if (result && this.isScanning) {
                             const code = result.getText();
                             this.scannedBarcode = code;
+                            this.lastScannedCode = code;
                             
-                            if (navigator.vibrate) navigator.vibrate(100);
+                            // Vibrate
+                            if (navigator.vibrate) navigator.vibrate(50);
                             
+                            // Handle based on mode
                             if (this.scannerMode === 'sales') {
+                                // Add to cart immediately
                                 this.scanInput = code;
                                 this.addToCartByCode();
-                                this.stopScanner();
+                                // Keep scanning for next item
+                                setTimeout(() => {
+                                    this.scannedBarcode = '';
+                                }, 800);
                             } else {
+                                // Products mode - find or fill
                                 const found = this.products.find(p => p.barcode === code);
                                 if (found) {
                                     this.productForm.name = found.name;
@@ -823,13 +929,19 @@
                                         this.productForm.stock = byName.stock;
                                     }
                                 }
+                                // Keep scanning
+                                setTimeout(() => {
+                                    if (this.showScanner) {
+                                        this.scannedBarcode = '';
+                                    }
+                                }, 1000);
                             }
                         }
                     });
                     
                 } catch (error) {
                     console.error('Scanner error:', error);
-                    alert('ناتوانێت کامێرا بکاتەوە. تکایە ڕێگەپێدان بدە بۆ کامێرا یان بە نوسین باڕکۆدەکە بنوسە.');
+                    alert('⚠️ ناتوانێت کامێرا بکاتەوە. تکایە:\n1. ڕێگەپێدان بدە بۆ کامێرا\n2. یان باڕکۆدەکە بە نوسین بنوسە');
                     this.stopScanner();
                 }
             },
@@ -837,6 +949,7 @@
             stopScanner() {
                 this.isScanning = false;
                 this.showScanner = false;
+                this.scannedBarcode = '';
                 
                 const video = document.querySelector('#scanBox video');
                 if (video && video.srcObject) {
@@ -854,10 +967,12 @@
             // ===== Sales =====
             addToCartByCode() {
                 const code = this.scanInput.trim();
-                if (!code) { alert('تکایە باڕکۆد یان ناو بنوسە'); return; }
+                if (!code) return;
+                
                 const product = this.products.find(p => 
                     p.barcode === code || p.name.toLowerCase().includes(code.toLowerCase())
                 );
+                
                 if (product) {
                     this.cart.push({ 
                         name: product.name, 
@@ -865,12 +980,16 @@
                         price: product.price 
                     });
                     this.scanInput = '';
+                    this.lastScannedCode = code;
+                    this.saveData();
                 } else {
+                    // Add as custom item
                     this.cart.push({ name: code, barcode: 'unknown', price: 0 });
                     this.scanInput = '';
+                    this.saveData();
                 }
-                this.saveData();
             },
+            
             finalizeSale() {
                 if (this.cart.length === 0) return;
                 const total = this.cart.reduce((sum, i) => sum + Number(i.price), 0);
@@ -890,13 +1009,6 @@
                 this.cart = [];
                 this.saveData();
                 alert(`✅ وەسڵ #${receipt.id} تۆمار کرا! کۆی گشتی ${total} د.ع`);
-            },
-            addByImage() {
-                const mockBarcode = prompt('کۆدی باڕکۆد لە وێنەکە دابنێ:');
-                if (mockBarcode) {
-                    this.scanInput = mockBarcode;
-                    this.addToCartByCode();
-                }
             },
             
             // ===== Products =====
@@ -935,24 +1047,8 @@
                     this.saveData();
                 }
             },
-            scanByInput() {
-                const code = prompt('باڕکۆد یان ناوی بەرهەم بنوسە:');
-                if (code) {
-                    this.scannedBarcode = code;
-                    const found = this.products.find(p => p.barcode === code || p.name.includes(code));
-                    if (found) {
-                        this.productForm.name = found.name;
-                        this.productForm.barcode = found.barcode;
-                        this.productForm.price = found.price;
-                        this.productForm.expiry = found.expiry || '';
-                        this.productForm.stock = found.stock;
-                    } else {
-                        this.productForm.barcode = code;
-                    }
-                }
-            },
             
-            // ===== Data Persistence =====
+            // ===== Data =====
             saveData() {
                 const data = {
                     products: this.products,
@@ -977,15 +1073,10 @@
             
             // ===== Tabs =====
             switchTab(tabId) {
-                // Update content
                 document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
                 document.getElementById(tabId).classList.add('active');
-                
-                // Update nav items
                 document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
                 document.querySelector(`.bottom-nav .nav-item[data-tab="${tabId}"]`).classList.add('active');
-                
-                // Scroll to top when switching tabs
                 document.getElementById('contentArea').scrollTop = 0;
             }
         },
