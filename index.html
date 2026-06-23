@@ -6,7 +6,7 @@
     <title>سیستەمی مارکێت</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-    <!-- QuaggaJS - باشترە بۆ باڕکۆد -->
+    <!-- QuaggaJS -->
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
     <style>
         * {
@@ -272,21 +272,36 @@
             background: #2563eb;
             color: white;
             border: none;
-            padding: 14px;
+            padding: 16px;
             border-radius: 16px;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 17px;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             cursor: pointer;
             transition: 0.15s;
             touch-action: manipulation;
+            position: relative;
+            overflow: hidden;
         }
         .scan-btn-large:active {
             transform: scale(0.96);
+        }
+        .scan-btn-large .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            animation: pulseRing 2s infinite;
+        }
+        @keyframes pulseRing {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
         }
         .scan-btn-large.warning {
             background: #f59e0b;
@@ -297,7 +312,7 @@
             cursor: not-allowed;
         }
         
-        /* Scanner Modal - Quagga */
+        /* Scanner Modal - Full screen with Quagga */
         .scanner-modal {
             position: fixed;
             top: 0;
@@ -337,15 +352,26 @@
             font-size: 17px;
             margin-bottom: 12px;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .scanner-modal .title .camera-icon {
+            animation: cameraPulse 1.5s infinite;
+        }
+        @keyframes cameraPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
         .scanner-modal .scan-box {
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
             aspect-ratio: 4/3;
-            background: #1a2332;
+            background: #0a0f1a;
             border-radius: 16px;
             position: relative;
             overflow: hidden;
+            border: 2px solid #1a2332;
         }
         .scanner-modal .scan-box video {
             width: 100%;
@@ -358,102 +384,147 @@
             left: 0;
             width: 100%;
             height: 100%;
+            display: none;
         }
         .scanner-modal .scan-box .overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 75%;
+            width: 80%;
             height: 55%;
-            border: 2px solid rgba(37, 99, 235, 0.5);
+            border: 2px solid rgba(37, 99, 235, 0.4);
             border-radius: 12px;
             pointer-events: none;
-            box-shadow: 0 0 0 4000px rgba(0,0,0,0.35);
+            box-shadow: 0 0 0 4000px rgba(0,0,0,0.3);
             z-index: 5;
+        }
+        .scanner-modal .scan-box .overlay .corners {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: #2563eb;
+            border-style: solid;
+            border-width: 0;
+        }
+        .scanner-modal .scan-box .overlay .corners.tl {
+            top: -2px;
+            left: -2px;
+            border-top-width: 3px;
+            border-left-width: 3px;
+            border-radius: 4px 0 0 0;
+        }
+        .scanner-modal .scan-box .overlay .corners.tr {
+            top: -2px;
+            right: -2px;
+            border-top-width: 3px;
+            border-right-width: 3px;
+            border-radius: 0 4px 0 0;
+        }
+        .scanner-modal .scan-box .overlay .corners.bl {
+            bottom: -2px;
+            left: -2px;
+            border-bottom-width: 3px;
+            border-left-width: 3px;
+            border-radius: 0 0 0 4px;
+        }
+        .scanner-modal .scan-box .overlay .corners.br {
+            bottom: -2px;
+            right: -2px;
+            border-bottom-width: 3px;
+            border-right-width: 3px;
+            border-radius: 0 0 4px 0;
         }
         .scanner-modal .scan-box .overlay .scan-line {
             position: absolute;
             top: 0;
-            left: 10%;
-            width: 80%;
+            left: 15%;
+            width: 70%;
             height: 2px;
-            background: #2563eb;
-            animation: scanMove 2s ease-in-out infinite;
-            box-shadow: 0 0 10px #2563eb;
+            background: linear-gradient(90deg, transparent, #2563eb, transparent);
+            animation: scanMove 2.5s ease-in-out infinite;
+            box-shadow: 0 0 20px #2563eb;
         }
         @keyframes scanMove {
-            0% { top: 5%; }
-            50% { top: 90%; }
-            100% { top: 5%; }
+            0% { top: 5%; opacity: 0.5; }
+            50% { top: 90%; opacity: 1; }
+            100% { top: 5%; opacity: 0.5; }
         }
         .scanner-modal .status {
             color: #94a3b8;
-            margin-top: 12px;
-            font-size: 13px;
+            margin-top: 14px;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         .scanner-modal .status .dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: #22c55e;
-            animation: blink 1s infinite;
+            animation: blink 1.2s infinite;
         }
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.2; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.2; transform: scale(0.8); }
         }
         .scanner-modal .status .dot.inactive {
             background: #ef4444;
             animation: none;
         }
         .scanner-modal .result-barcode {
-            background: rgba(255,255,255,0.1);
-            padding: 8px 20px;
+            background: rgba(255,255,255,0.08);
+            padding: 8px 24px;
             border-radius: 40px;
             color: #facc15;
             font-weight: 700;
-            font-size: 20px;
-            margin-top: 8px;
-            font-family: monospace;
-            letter-spacing: 2px;
+            font-size: 22px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
             direction: ltr;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         .scanner-modal .result-barcode .check {
             color: #22c55e;
-            margin-left: 8px;
+            margin-left: 10px;
+            font-size: 18px;
         }
         .scanner-modal .btn-stop {
-            margin-top: 14px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            margin-top: 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
             color: white;
-            padding: 10px 28px;
+            padding: 10px 32px;
             border-radius: 40px;
             font-size: 14px;
             cursor: pointer;
             touch-action: manipulation;
+            transition: 0.15s;
         }
         .scanner-modal .btn-stop:active {
             transform: scale(0.95);
+            background: rgba(255,255,255,0.15);
         }
         .scanner-modal .hint {
             color: #64748b;
             font-size: 11px;
-            margin-top: 8px;
+            margin-top: 10px;
         }
         .scanner-modal .fallback-btn {
             margin-top: 10px;
-            background: rgba(255,255,255,0.08);
-            border: 1px dashed rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            border: 1px dashed rgba(255,255,255,0.15);
             color: #94a3b8;
             padding: 8px 20px;
             border-radius: 40px;
             font-size: 12px;
             cursor: pointer;
+            transition: 0.15s;
+        }
+        .scanner-modal .fallback-btn:active {
+            background: rgba(255,255,255,0.1);
         }
         
         .receipt-paper {
@@ -517,16 +588,6 @@
         .list-item .info strong { display: block; font-size: 14px; color: #0f172a; }
         .badge-success { background: #d1fae5; color: #065f46; padding: 2px 10px; border-radius: 40px; font-size: 11px; }
         
-        .total-box {
-            background: #1e293b;
-            color: white;
-            border-radius: 16px;
-            padding: 12px;
-            margin-top: 8px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 16px;
-        }
         .empty-state {
             text-align: center;
             color: #94a3b8;
@@ -560,8 +621,9 @@
             color: #facc15;
             font-size: 16px;
             margin-top: 6px;
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
             direction: ltr;
+            letter-spacing: 1px;
         }
         
         .quick-scan-indicator {
@@ -575,6 +637,12 @@
             align-items: center;
             gap: 6px;
             margin-top: 6px;
+        }
+        .quick-scan-indicator .code {
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+            display: inline-block;
+            letter-spacing: 1px;
         }
         
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
@@ -596,8 +664,9 @@
             <div class="card">
                 <div class="card-title"><i class="fas fa-camera"></i> سکان و فرۆشتن</div>
                 <button class="scan-btn-large" @click="startScanner('sales')">
+                    <span class="pulse-ring"></span>
                     <i class="fas fa-camera"></i>
-                    کلیک بکە بۆ سکانی باڕکۆد
+                    کلیک بکە بۆ سکان
                 </button>
                 <div style="margin-top:8px; display:flex; gap:6px;">
                     <input type="text" placeholder="یان بە نوسین..." v-model="scanInput" @keyup.enter="addToCartByCode" style="flex:1;">
@@ -605,7 +674,7 @@
                 </div>
                 <div v-if="lastScannedCode" class="quick-scan-indicator">
                     <i class="fas fa-check-circle"></i>
-                    دوایین سکان: <span style="font-family:monospace;direction:ltr;display:inline-block;">{{ lastScannedCode }}</span>
+                    دوایین سکان: <span class="code">{{ lastScannedCode }}</span>
                 </div>
             </div>
 
@@ -658,7 +727,7 @@
                 <div class="card-title"><i class="fas fa-box"></i> زیادکردن / دەستکاری</div>
                 <button class="scan-btn-large warning" @click="startScanner('products')" style="margin-bottom:8px;">
                     <i class="fas fa-camera"></i>
-                    سکان بۆ دۆزینەوەی بەرهەم
+                    سکان بۆ دۆزینەوە
                 </button>
                 <div class="flex-row">
                     <div class="grow">
@@ -752,12 +821,19 @@
         </button>
     </div>
 
-    <!-- Scanner Modal - Quagga -->
+    <!-- Scanner Modal -->
     <div v-if="showScanner" class="scanner-modal">
         <button class="close-btn" @click="stopScanner">✕</button>
-        <div class="title"><i class="fas fa-camera"></i> سکانی باڕکۆد</div>
+        <div class="title">
+            <span class="camera-icon">📷</span>
+            سکانی باڕکۆد
+        </div>
         <div class="scan-box" id="scanBox">
             <div class="overlay">
+                <div class="corners tl"></div>
+                <div class="corners tr"></div>
+                <div class="corners bl"></div>
+                <div class="corners br"></div>
                 <div class="scan-line"></div>
             </div>
         </div>
@@ -800,7 +876,8 @@
             scannerMode: 'sales',
             currentDate: new Date().toISOString().slice(0,10),
             isScanning: false,
-            scannerStatus: 'چاوەڕوانی سکان...'
+            scannerStatus: 'چاوەڕوانی سکان...',
+            scanTimeout: null
         },
         computed: {
             totalCartPrice() {
@@ -818,7 +895,7 @@
             }
         },
         methods: {
-            // ===== Quagga Scanner =====
+            // ===== Quagga Scanner - Fast & Direct =====
             startScanner(mode) {
                 this.scannerMode = mode;
                 this.showScanner = true;
@@ -826,14 +903,15 @@
                 this.isScanning = true;
                 this.scannerStatus = 'کامێرا دەکاتەوە...';
                 
-                // Clear any previous video
                 const scanBox = document.getElementById('scanBox');
+                
+                // Clean previous
                 const oldVideo = scanBox.querySelector('video');
                 if (oldVideo) oldVideo.remove();
                 const oldCanvas = scanBox.querySelector('canvas');
                 if (oldCanvas) oldCanvas.remove();
                 
-                // Configure Quagga
+                // Quagga config - optimized for speed
                 Quagga.init({
                     inputStream: {
                         name: "Live",
@@ -842,61 +920,69 @@
                         constraints: {
                             facingMode: "environment",
                             width: { ideal: 640 },
-                            height: { ideal: 480 }
+                            height: { ideal: 480 },
+                            frameRate: { ideal: 30 }
                         }
                     },
                     decoder: {
                         readers: [
                             "ean_reader",
-                            "ean_8_reader",
+                            "ean_8_reader", 
                             "code_128_reader",
                             "code_39_reader",
                             "upc_reader"
                         ],
                         multiple: false
                     },
-                    locate: true
+                    locate: true,
+                    numOfWorkers: 2
                 }, (err) => {
                     if (err) {
-                        console.error('Quagga init error:', err);
+                        console.error('Quagga error:', err);
                         this.scannerStatus = '⚠️ هەڵەی کامێرا';
                         this.isScanning = false;
                         alert('⚠️ ناتوانێت کامێرا بکاتەوە. تکایە ڕێگەپێدان بدە یان بە نوسین بنوسە.');
                         return;
                     }
                     
-                    this.scannerStatus = 'چاوەڕوانی سکان...';
+                    this.scannerStatus = '🔍 چاوەڕوانی سکان...';
                     Quagga.start();
                 });
                 
-                // On detected
+                // On barcode detected - immediate response
                 Quagga.onDetected((result) => {
                     if (!this.isScanning) return;
                     
                     const code = result.codeResult.code;
                     if (!code) return;
                     
+                    // Vibrate for feedback
+                    if (navigator.vibrate) navigator.vibrate(30);
+                    
                     this.scannedBarcode = code;
                     this.lastScannedCode = code;
                     this.scannerStatus = '✅ سکان کرا!';
                     
-                    if (navigator.vibrate) navigator.vibrate(50);
-                    
                     if (this.scannerMode === 'sales') {
+                        // Add to cart immediately
                         this.scanInput = code;
                         this.addToCartByCode();
-                        setTimeout(() => {
+                        // Reset for next scan after 1 second
+                        if (this.scanTimeout) clearTimeout(this.scanTimeout);
+                        this.scanTimeout = setTimeout(() => {
                             this.scannedBarcode = '';
                             if (this.showScanner && this.isScanning) {
-                                this.scannerStatus = 'چاوەڕوانی سکان...';
+                                this.scannerStatus = '🔍 چاوەڕوانی سکان...';
                             }
-                        }, 1200);
+                        }, 1000);
                     } else {
+                        // Products mode
                         this.findProductByBarcode(code);
-                        setTimeout(() => {
+                        if (this.scanTimeout) clearTimeout(this.scanTimeout);
+                        this.scanTimeout = setTimeout(() => {
                             this.scannedBarcode = '';
                             if (this.showScanner && this.isScanning) {
-                                this.scannerStatus = 'چاوەڕوانی سکان...';
+                                this.scannerStatus = '🔍 چاوەڕوانی سکان...';
                             }
                         }, 1500);
                     }
@@ -907,17 +993,19 @@
                 this.isScanning = false;
                 this.showScanner = false;
                 this.scannedBarcode = '';
+                if (this.scanTimeout) clearTimeout(this.scanTimeout);
                 
                 try {
                     Quagga.stop();
                 } catch(e) {}
                 
-                // Clean up video
                 const scanBox = document.getElementById('scanBox');
                 const video = scanBox.querySelector('video');
                 if (video && video.srcObject) {
-                    video.srcObject.getTracks().forEach(track => track.stop());
-                    video.srcObject = null;
+                    try {
+                        video.srcObject.getTracks().forEach(track => track.stop());
+                        video.srcObject = null;
+                    } catch(e) {}
                 }
             },
             
