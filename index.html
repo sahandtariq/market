@@ -6,8 +6,8 @@
     <title>سیستەمی مارکێت - پیشکەش</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-    <!-- QuaggaJS بۆ خوێندنەوەی باڕکۆد -->
-    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.2/dist/quagga.min.js"></script>
+    <!-- ئەم جارە ZXing بەکاردەهێنین کە کاراترە -->
+    <script src="https://unpkg.com/@zxing/library@0.18.6/umd/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -181,8 +181,8 @@
         }
         #scanner-box {
             width: 100%;
-            max-width: 300px;
-            height: 200px;
+            max-width: 350px;
+            height: 250px;
             margin: 0 auto;
             background: #1e293b;
             border-radius: 16px;
@@ -193,13 +193,10 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 16px;
         }
         #scanner-box canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            display: none;
         }
         .scanner-overlay {
             position: absolute;
@@ -207,11 +204,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
             width: 70%;
-            height: 60%;
+            height: 50%;
             border: 3px solid rgba(37, 99, 235, 0.6);
             border-radius: 12px;
             pointer-events: none;
             box-shadow: 0 0 0 4000px rgba(0,0,0,0.3);
+            z-index: 10;
         }
         .scanner-overlay::after {
             content: '';
@@ -222,6 +220,7 @@
             height: 3px;
             background: #2563eb;
             animation: scanLine 2s linear infinite;
+            border-radius: 2px;
         }
         @keyframes scanLine {
             0% { top: -2px; }
@@ -335,7 +334,6 @@
         .w-full { width: 100%; }
         .hidden { display: none; }
         
-        /* Stats */
         .stat-card {
             background: #eef2ff;
             padding: 16px;
@@ -347,6 +345,110 @@
         .stat-card .value { font-size: 24px; font-weight: 700; color: #0f172a; }
         .stat-card.green { background: #d1fae5; }
         .stat-card.green .value { color: #065f46; }
+
+        /* Scanner Modal */
+        .scanner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: #0f172a;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .scanner-modal .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            color: white;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            z-index: 20;
+        }
+        .scanner-modal .title {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .scanner-modal .scan-box {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 4/3;
+            background: #1e293b;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .scanner-modal .scan-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .scanner-modal .scan-box .overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 50%;
+            border: 3px solid rgba(37, 99, 235, 0.6);
+            border-radius: 12px;
+            pointer-events: none;
+            box-shadow: 0 0 0 4000px rgba(0,0,0,0.3);
+        }
+        .scanner-modal .scan-box .overlay::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #2563eb;
+            animation: scanLine 2s linear infinite;
+        }
+        .scanner-modal .status {
+            color: #94a3b8;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        .scanner-modal .status i {
+            color: #22c55e;
+        }
+        .scanner-modal .result {
+            background: #1e293b;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #facc15;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 12px;
+        }
+        .scanner-modal .btn-stop {
+            margin-top: 20px;
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 40px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn-stop:hover { background: rgba(255,255,255,0.1); }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
     </style>
 </head>
 <body>
@@ -372,9 +474,13 @@
                 </div>
                 <button class="btn btn-sm" @click="addToCartByCode"><i class="fas fa-plus"></i> زیاد</button>
             </div>
-            <div style="margin-top:8px;">
-                <button class="btn btn-outline btn-sm" @click="startScanner('sales')"><i class="fas fa-camera"></i> سکان بە کامێرا</button>
-                <button class="btn btn-outline btn-sm" @click="addByImage"><i class="fas fa-image"></i> لە وێنە</button>
+            <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-warning btn-sm" @click="startScanner('sales')">
+                    <i class="fas fa-camera"></i> سکان بە کامێرا
+                </button>
+                <button class="btn btn-outline btn-sm" @click="addByImage">
+                    <i class="fas fa-image"></i> لە وێنە
+                </button>
             </div>
         </div>
 
@@ -434,7 +540,7 @@
                     <input type="text" placeholder="ناوی بەرهەم" v-model="productForm.name">
                 </div>
                 <div class="grow">
-                    <input type="text" placeholder="باڕکۆد" v-model="productForm.barcode">
+                    <input type="text" placeholder="باڕکۆد" v-model="productForm.barcode" id="barcodeInput">
                 </div>
             </div>
             <div class="flex-row">
@@ -513,25 +619,26 @@
         </div>
     </div>
 
-    <!-- Scanner Modal -->
-    <div v-if="showScanner" class="scanner-container" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999; background:#0f172a; border-radius:0; padding:40px 20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="color:white; font-size:20px;"><i class="fas fa-camera"></i> سکانی باڕکۆد</h3>
-            <button @click="stopScanner" style="background:transparent; color:white; border:none; font-size:28px; cursor:pointer;">✕</button>
+    <!-- Scanner Modal - ZXing -->
+    <div v-if="showScanner" class="scanner-modal">
+        <button class="close-btn" @click="stopScanner">✕</button>
+        <div class="title"><i class="fas fa-camera"></i> سکانی باڕکۆد</div>
+        <div class="scan-box" id="scanBox">
+            <div class="overlay"></div>
         </div>
-        <div id="scanner-box">
-            <div class="scanner-overlay"></div>
-        </div>
-        <div class="scanner-status">
-            <i class="fas fa-circle" style="color:#22c55e; animation: pulse 1s infinite;"></i>
+        <div class="status">
+            <i class="fas fa-circle pulse"></i>
             <span>چاوەڕوانی سکان...</span>
         </div>
-        <div v-if="scannedBarcode" class="barcode-result">
+        <div v-if="scannedBarcode" class="result">
             <i class="fas fa-check-circle" style="color:#22c55e;"></i> {{ scannedBarcode }}
         </div>
-        <button class="btn btn-outline" @click="stopScanner" style="margin-top:20px; color:white; border-color:white;">
+        <button class="btn-stop" @click="stopScanner">
             <i class="fas fa-times"></i> داخستن
         </button>
+        <div style="color:#64748b; font-size:12px; margin-top:12px;">
+            باڕکۆدەکە بخەرە ناو چوارگۆشەکە
+        </div>
     </div>
 </div>
 
@@ -553,8 +660,10 @@
             scanInput: '',
             scannedBarcode: '',
             showScanner: false,
-            scannerMode: 'sales', // 'sales' or 'products'
-            currentDate: new Date().toISOString().slice(0,10)
+            scannerMode: 'sales',
+            currentDate: new Date().toISOString().slice(0,10),
+            codeReader: null,
+            isScanning: false
         },
         computed: {
             totalCartPrice() {
@@ -572,71 +681,107 @@
             }
         },
         methods: {
-            // ===== Scanner =====
-            startScanner(mode) {
+            // ===== Scanner with ZXing =====
+            async startScanner(mode) {
                 this.scannerMode = mode;
                 this.showScanner = true;
                 this.scannedBarcode = '';
+                this.isScanning = true;
                 
-                this.$nextTick(() => {
-                    Quagga.init({
-                        inputStream: {
-                            name: "Live",
-                            type: "LiveStream",
-                            target: document.querySelector('#scanner-box'),
-                            constraints: {
-                                facingMode: "environment",
-                                width: 400,
-                                height: 300
-                            }
-                        },
-                        decoder: {
-                            readers: ["ean_reader", "ean_8_reader", "code_128_reader", "code_39_reader", "upc_reader"]
-                        }
-                    }, (err) => {
-                        if (err) {
-                            console.error(err);
-                            alert('ناتوانێت کامێرا بکاتەوە. تکایە ڕێگەپێدان بدە بۆ کامێرا.');
-                            this.stopScanner();
-                            return;
-                        }
-                        Quagga.start();
+                try {
+                    // Initialize ZXing
+                    if (!this.codeReader) {
+                        this.codeReader = new ZXing.BrowserMultiFormatReader();
+                    }
+                    
+                    const videoElement = document.querySelector('#scanBox video');
+                    
+                    // Request camera permission
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
                     });
-
-                    Quagga.onDetected((result) => {
-                        const code = result.codeResult.code;
-                        this.scannedBarcode = code;
-                        Quagga.stop();
-                        
-                        if (this.scannerMode === 'sales') {
-                            this.scanInput = code;
-                            this.addToCartByCode();
-                            this.stopScanner();
-                        } else {
-                            // products mode - fill form
-                            const found = this.products.find(p => p.barcode === code);
-                            if (found) {
-                                this.productForm.name = found.name;
-                                this.productForm.barcode = found.barcode;
-                                this.productForm.price = found.price;
-                                this.productForm.expiry = found.expiry || '';
-                                this.productForm.stock = found.stock;
+                    
+                    // Create video element if not exists
+                    let video = videoElement;
+                    if (!video) {
+                        video = document.createElement('video');
+                        video.setAttribute('autoplay', '');
+                        video.setAttribute('playsinline', '');
+                        document.querySelector('#scanBox').appendChild(video);
+                    }
+                    
+                    video.srcObject = stream;
+                    await video.play();
+                    
+                    // Start decoding
+                    this.codeReader.decodeFromVideoElement(video, (result, err) => {
+                        if (result && this.isScanning) {
+                            const code = result.getText();
+                            this.scannedBarcode = code;
+                            
+                            // Vibrate on success (if supported)
+                            if (navigator.vibrate) navigator.vibrate(100);
+                            
+                            if (this.scannerMode === 'sales') {
+                                this.scanInput = code;
+                                this.addToCartByCode();
+                                this.stopScanner();
                             } else {
-                                this.productForm.barcode = code;
-                            }
-                            // Keep scanner open for multiple scans
-                            setTimeout(() => {
-                                if (this.showScanner) {
-                                    Quagga.start();
+                                // Products mode
+                                const found = this.products.find(p => p.barcode === code);
+                                if (found) {
+                                    this.productForm.name = found.name;
+                                    this.productForm.barcode = found.barcode;
+                                    this.productForm.price = found.price;
+                                    this.productForm.expiry = found.expiry || '';
+                                    this.productForm.stock = found.stock;
+                                } else {
+                                    this.productForm.barcode = code;
+                                    // Try to find product by name if barcode not found
+                                    const byName = this.products.find(p => p.name.includes(code) || code.includes(p.name));
+                                    if (byName) {
+                                        this.productForm.name = byName.name;
+                                        this.productForm.price = byName.price;
+                                        this.productForm.expiry = byName.expiry || '';
+                                        this.productForm.stock = byName.stock;
+                                    }
                                 }
-                            }, 1500);
+                                // Keep scanning for products mode
+                                setTimeout(() => {
+                                    if (this.showScanner && this.isScanning) {
+                                        // continue scanning
+                                    }
+                                }, 1000);
+                            }
+                        }
+                        if (err && err instanceof ZXing.NotFoundException) {
+                            // No barcode found, continue scanning
                         }
                     });
-                });
+                    
+                } catch (error) {
+                    console.error('Scanner error:', error);
+                    alert('ناتوانێت کامێرا بکاتەوە. تکایە ڕێگەپێدان بدە بۆ کامێرا یان بە نوسین باڕکۆدەکە بنوسە.');
+                    this.stopScanner();
+                }
             },
+            
             stopScanner() {
-                Quagga.stop();
+                this.isScanning = false;
                 this.showScanner = false;
+                
+                // Stop all video tracks
+                const video = document.querySelector('#scanBox video');
+                if (video && video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                    video.srcObject = null;
+                }
+                
+                if (this.codeReader) {
+                    try {
+                        this.codeReader.reset();
+                    } catch(e) {}
+                }
             },
             
             // ===== Sales =====
@@ -757,10 +902,14 @@
             loadData() {
                 const saved = localStorage.getItem('marketData');
                 if (saved) {
-                    const data = JSON.parse(saved);
-                    this.products = data.products || [];
-                    this.receipts = data.receipts || [];
-                    this.receiptCounter = data.receiptCounter || 101;
+                    try {
+                        const data = JSON.parse(saved);
+                        this.products = data.products || [];
+                        this.receipts = data.receipts || [];
+                        this.receiptCounter = data.receiptCounter || 101;
+                    } catch(e) {
+                        console.error('Error loading data:', e);
+                    }
                 }
             },
             
@@ -775,21 +924,21 @@
         mounted() {
             this.loadData();
             
-            // Auto-save on changes
             this.$watch('products', () => this.saveData(), { deep: true });
             this.$watch('receipts', () => this.saveData(), { deep: true });
             this.$watch('receiptCounter', () => this.saveData());
             
-            // Auto-save before page close
             window.addEventListener('beforeunload', () => this.saveData());
             
-            // Tab listeners
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const tab = btn.dataset.tab;
                     this.switchTab(tab);
                 });
             });
+        },
+        beforeDestroy() {
+            this.stopScanner();
         }
     });
 </script>
