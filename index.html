@@ -6,8 +6,6 @@
     <title>سیستەمی مارکێت - پیشکەش</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-    <!-- ZXing for barcode scanning -->
-    <script src="https://unpkg.com/@zxing/library@0.18.6/umd/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -19,9 +17,6 @@
         html, body {
             touch-action: manipulation;
             -webkit-text-size-adjust: 100%;
-            -moz-text-size-adjust: 100%;
-            -ms-text-size-adjust: 100%;
-            text-size-adjust: 100%;
             background: #f0f4f8;
             height: 100vh;
             overflow: hidden;
@@ -43,7 +38,6 @@
             margin: 0 auto;
         }
         
-        /* Header */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -70,7 +64,6 @@
             border-radius: 14px;
         }
         
-        /* Content */
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -86,7 +79,6 @@
             border-radius: 10px;
         }
         
-        /* Tabs */
         .tab-content {
             display: none;
             animation: fade 0.2s ease;
@@ -99,7 +91,6 @@
             to { opacity: 1; } 
         }
         
-        /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -137,7 +128,6 @@
         }
         .bottom-nav .nav-item i {
             font-size: 20px;
-            transition: 0.2s;
         }
         .bottom-nav .nav-item span {
             font-size: 9px;
@@ -170,7 +160,6 @@
             text-align: center;
         }
         
-        /* Cards */
         .card {
             background: white;
             border-radius: 18px;
@@ -194,7 +183,6 @@
             font-size: 15px;
         }
         
-        /* Inputs */
         .flex-row {
             display: flex;
             flex-wrap: wrap;
@@ -214,7 +202,6 @@
             outline: none;
             transition: 0.15s;
             -webkit-appearance: none;
-            appearance: none;
         }
         input:focus {
             border-color: #2563eb;
@@ -229,7 +216,6 @@
             margin: 0;
         }
         
-        /* Buttons */
         .btn {
             background: #2563eb;
             color: white;
@@ -274,11 +260,7 @@
             cursor: not-allowed;
             transform: none;
         }
-        .btn-success:disabled {
-            opacity: 0.5;
-        }
         
-        /* Scanner Button - Large & Prominent */
         .scan-btn-large {
             background: #2563eb;
             color: white;
@@ -299,15 +281,16 @@
         .scan-btn-large:active {
             transform: scale(0.96);
         }
-        .scan-btn-large i {
-            font-size: 22px;
-        }
         .scan-btn-large.warning {
             background: #f59e0b;
             color: #0f172a;
         }
+        .scan-btn-large:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         
-        /* Scanner Modal - Full Screen */
+        /* Simple Scanner - using input file as fallback */
         .scanner-modal {
             position: fixed;
             top: 0;
@@ -356,11 +339,29 @@
             border-radius: 16px;
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .scanner-modal .scan-box video {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 16px;
+        }
+        .scanner-modal .scan-box .placeholder {
+            color: #64748b;
+            text-align: center;
+            padding: 20px;
+        }
+        .scanner-modal .scan-box .placeholder i {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+            color: #475569;
+        }
+        .scanner-modal .scan-box .placeholder p {
+            font-size: 14px;
         }
         .scanner-modal .scan-box .overlay {
             position: absolute;
@@ -373,42 +374,6 @@
             border-radius: 12px;
             pointer-events: none;
             box-shadow: 0 0 0 4000px rgba(0,0,0,0.35);
-        }
-        .scanner-modal .scan-box .overlay .corner {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            border-color: #2563eb;
-            border-style: solid;
-            border-width: 0;
-        }
-        .scanner-modal .scan-box .overlay .corner.tl {
-            top: -2px;
-            left: -2px;
-            border-top-width: 3px;
-            border-left-width: 3px;
-            border-radius: 4px 0 0 0;
-        }
-        .scanner-modal .scan-box .overlay .corner.tr {
-            top: -2px;
-            right: -2px;
-            border-top-width: 3px;
-            border-right-width: 3px;
-            border-radius: 0 4px 0 0;
-        }
-        .scanner-modal .scan-box .overlay .corner.bl {
-            bottom: -2px;
-            left: -2px;
-            border-bottom-width: 3px;
-            border-left-width: 3px;
-            border-radius: 0 0 0 4px;
-        }
-        .scanner-modal .scan-box .overlay .corner.br {
-            bottom: -2px;
-            right: -2px;
-            border-bottom-width: 3px;
-            border-right-width: 3px;
-            border-radius: 0 0 4px 0;
         }
         .scanner-modal .scan-box .overlay .scan-line {
             position: absolute;
@@ -444,6 +409,10 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.2; }
         }
+        .scanner-modal .status .dot.inactive {
+            background: #ef4444;
+            animation: none;
+        }
         .scanner-modal .result-barcode {
             background: rgba(255,255,255,0.1);
             padding: 6px 16px;
@@ -454,10 +423,6 @@
             margin-top: 8px;
             font-family: monospace;
             letter-spacing: 1px;
-        }
-        .scanner-modal .result-barcode .check {
-            color: #22c55e;
-            margin-right: 6px;
         }
         .scanner-modal .btn-stop {
             margin-top: 14px;
@@ -478,8 +443,17 @@
             font-size: 11px;
             margin-top: 8px;
         }
+        .scanner-modal .fallback-btn {
+            margin-top: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px dashed rgba(255,255,255,0.2);
+            color: #94a3b8;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 12px;
+            cursor: pointer;
+        }
         
-        /* Receipt */
         .receipt-paper {
             background: white;
             border-radius: 14px;
@@ -562,7 +536,6 @@
         .mb-2 { margin-bottom: 8px; }
         .text-center { text-align: center; }
         .hidden { display: none; }
-        .gap-1 { gap: 4px; }
         
         .stat-card {
             background: #eef2ff;
@@ -588,7 +561,6 @@
             font-family: monospace;
         }
         
-        /* Quick scan indicator */
         .quick-scan-indicator {
             background: #dcfce7;
             color: #065f46;
@@ -601,10 +573,6 @@
             gap: 6px;
             margin-top: 6px;
         }
-        .quick-scan-indicator i {
-            color: #22c55e;
-            animation: pulse 1s infinite;
-        }
         
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
             .bottom-nav {
@@ -615,19 +583,15 @@
 </head>
 <body>
 <div class="app-container" id="app">
-    <!-- Header -->
     <div class="app-header">
         <h1>🏪 مارکێت<span>Hub</span></h1>
         <i class="fas fa-qrcode"></i>
     </div>
 
-    <!-- Content -->
     <div class="content-area" id="contentArea">
-        <!-- TAB 1: فرۆشتن -->
         <div id="tab-sales" class="tab-content active">
             <div class="card">
                 <div class="card-title"><i class="fas fa-camera"></i> سکان و فرۆشتن</div>
-                <!-- Large Scan Button -->
                 <button class="scan-btn-large" @click="startScanner('sales')">
                     <i class="fas fa-camera"></i>
                     کلیک بکە بۆ سکانی باڕکۆد
@@ -686,11 +650,9 @@
             </div>
         </div>
 
-        <!-- TAB 2: بەرهەمەکان -->
         <div id="tab-products" class="tab-content">
             <div class="card">
                 <div class="card-title"><i class="fas fa-box"></i> زیادکردن / دەستکاری</div>
-                <!-- Quick Scan for Products -->
                 <button class="scan-btn-large warning" @click="startScanner('products')" style="margin-bottom:8px;">
                     <i class="fas fa-camera"></i>
                     سکان بۆ دۆزینەوەی بەرهەم
@@ -736,7 +698,6 @@
             </div>
         </div>
 
-        <!-- TAB 3: داهات -->
         <div id="tab-reports" class="tab-content">
             <div class="card">
                 <div class="card-title"><i class="fas fa-chart-simple"></i> داهات</div>
@@ -772,7 +733,6 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
     <div class="bottom-nav">
         <button class="nav-item active" data-tab="tab-sales" @click="switchTab('tab-sales')">
             <i class="fas fa-cash-register"></i>
@@ -795,28 +755,29 @@
         <div class="title"><i class="fas fa-camera"></i> سکانی باڕکۆد</div>
         <div class="scan-box" id="scanBox">
             <div class="overlay">
-                <div class="corner tl"></div>
-                <div class="corner tr"></div>
-                <div class="corner bl"></div>
-                <div class="corner br"></div>
                 <div class="scan-line"></div>
             </div>
         </div>
         <div class="status">
-            <span class="dot"></span>
-            <span>چاوەڕوانی سکان...</span>
+            <span class="dot" :class="{ inactive: !isScanning }"></span>
+            <span>{{ scannerStatus }}</span>
         </div>
         <div v-if="scannedBarcode" class="result-barcode">
-            <span class="check">✅</span> {{ scannedBarcode }}
+            ✅ {{ scannedBarcode }}
         </div>
         <button class="btn-stop" @click="stopScanner">
             <i class="fas fa-times"></i> داخستن
         </button>
         <div class="hint">باڕکۆدەکە بخەرە ناو چوارگۆشەکە</div>
+        <button class="fallback-btn" @click="manualBarcodeEntry">
+            <i class="fas fa-keyboard"></i> بە نوسین بنوسە
+        </button>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<!-- Use a simpler barcode reader library -->
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.js"></script>
 <script>
     new Vue({
         el: '#app',
@@ -837,9 +798,10 @@
             showScanner: false,
             scannerMode: 'sales',
             currentDate: new Date().toISOString().slice(0,10),
-            codeReader: null,
             isScanning: false,
-            scanTimeout: null
+            scannerStatus: 'چاوەڕوانی سکان...',
+            codeReader: null,
+            scanAttempts: 0
         },
         computed: {
             totalCartPrice() {
@@ -857,19 +819,28 @@
             }
         },
         methods: {
-            // ===== Fast Scanner =====
+            // ===== Scanner =====
             async startScanner(mode) {
                 this.scannerMode = mode;
                 this.showScanner = true;
                 this.scannedBarcode = '';
                 this.isScanning = true;
+                this.scannerStatus = 'کامێرا دەکاتەوە...';
+                this.scanAttempts = 0;
                 
                 try {
-                    if (!this.codeReader) {
-                        this.codeReader = new ZXing.BrowserMultiFormatReader();
+                    // First check if camera is available
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    const hasCamera = devices.some(d => d.kind === 'videoinput');
+                    
+                    if (!hasCamera) {
+                        this.scannerStatus = '⚠️ هیچ کامێرایەک نەدۆزرایەوە';
+                        this.isScanning = false;
+                        alert('⚠️ هیچ کامێرایەک نەدۆزرایەوە لەم ئامێرەدا. تکایە بە نوسین باڕکۆدەکە بنوسە.');
+                        return;
                     }
                     
-                    // Get video element
+                    // Create video element
                     let video = document.querySelector('#scanBox video');
                     if (!video) {
                         video = document.createElement('video');
@@ -879,7 +850,7 @@
                         document.querySelector('#scanBox').appendChild(video);
                     }
                     
-                    // Start camera
+                    // Get camera stream
                     const stream = await navigator.mediaDevices.getUserMedia({
                         video: { 
                             facingMode: 'environment',
@@ -891,58 +862,59 @@
                     video.srcObject = stream;
                     await video.play();
                     
-                    // Start decoding - continuous mode
+                    this.scannerStatus = 'چاوەڕوانی سکان...';
+                    
+                    // Initialize ZXing reader
+                    if (!this.codeReader) {
+                        this.codeReader = new ZXing.BrowserMultiFormatReader();
+                    }
+                    
+                    // Start decoding
                     this.codeReader.decodeFromVideoElement(video, (result, err) => {
                         if (result && this.isScanning) {
                             const code = result.getText();
                             this.scannedBarcode = code;
                             this.lastScannedCode = code;
+                            this.scannerStatus = '✅ سکان کرا!';
                             
-                            // Vibrate
                             if (navigator.vibrate) navigator.vibrate(50);
                             
                             // Handle based on mode
                             if (this.scannerMode === 'sales') {
-                                // Add to cart immediately
                                 this.scanInput = code;
                                 this.addToCartByCode();
-                                // Keep scanning for next item
+                                // Reset for next scan after 1 second
                                 setTimeout(() => {
                                     this.scannedBarcode = '';
-                                }, 800);
+                                    if (this.showScanner && this.isScanning) {
+                                        this.scannerStatus = 'چاوەڕوانی سکان...';
+                                    }
+                                }, 1200);
                             } else {
-                                // Products mode - find or fill
-                                const found = this.products.find(p => p.barcode === code);
-                                if (found) {
-                                    this.productForm.name = found.name;
-                                    this.productForm.barcode = found.barcode;
-                                    this.productForm.price = found.price;
-                                    this.productForm.expiry = found.expiry || '';
-                                    this.productForm.stock = found.stock;
-                                } else {
-                                    this.productForm.barcode = code;
-                                    const byName = this.products.find(p => p.name.includes(code) || code.includes(p.name));
-                                    if (byName) {
-                                        this.productForm.name = byName.name;
-                                        this.productForm.price = byName.price;
-                                        this.productForm.expiry = byName.expiry || '';
-                                        this.productForm.stock = byName.stock;
-                                    }
-                                }
-                                // Keep scanning
+                                // Products mode
+                                this.findProductByBarcode(code);
                                 setTimeout(() => {
-                                    if (this.showScanner) {
-                                        this.scannedBarcode = '';
+                                    this.scannedBarcode = '';
+                                    if (this.showScanner && this.isScanning) {
+                                        this.scannerStatus = 'چاوەڕوانی سکان...';
                                     }
-                                }, 1000);
+                                }, 1500);
                             }
                         }
                     });
                     
                 } catch (error) {
                     console.error('Scanner error:', error);
-                    alert('⚠️ ناتوانێت کامێرا بکاتەوە. تکایە:\n1. ڕێگەپێدان بدە بۆ کامێرا\n2. یان باڕکۆدەکە بە نوسین بنوسە');
-                    this.stopScanner();
+                    this.isScanning = false;
+                    this.scannerStatus = '⚠️ هەڵەی کامێرا';
+                    
+                    if (error.name === 'NotAllowedError') {
+                        alert('⚠️ ڕێگەپێدان بۆ کامێرا نەدراوە. تکایە ڕێگەپێدان بدە و دووبارە هەوڵبدەوە.');
+                    } else if (error.name === 'NotFoundError') {
+                        alert('⚠️ هیچ کامێرایەک نەدۆزرایەوە. تکایە بە نوسین باڕکۆدەکە بنوسە.');
+                    } else {
+                        alert('⚠️ کێشە لە کردنەوەی کامێرا. تکایە بە نوسین باڕکۆدەکە بنوسە.');
+                    }
                 }
             },
             
@@ -953,14 +925,55 @@
                 
                 const video = document.querySelector('#scanBox video');
                 if (video && video.srcObject) {
-                    video.srcObject.getTracks().forEach(track => track.stop());
-                    video.srcObject = null;
+                    try {
+                        video.srcObject.getTracks().forEach(track => track.stop());
+                        video.srcObject = null;
+                    } catch(e) {}
                 }
                 
                 if (this.codeReader) {
                     try {
                         this.codeReader.reset();
                     } catch(e) {}
+                }
+            },
+            
+            findProductByBarcode(code) {
+                const found = this.products.find(p => p.barcode === code);
+                if (found) {
+                    this.productForm.name = found.name;
+                    this.productForm.barcode = found.barcode;
+                    this.productForm.price = found.price;
+                    this.productForm.expiry = found.expiry || '';
+                    this.productForm.stock = found.stock;
+                    this.scannerStatus = '✅ بەرهەم دۆزرایەوە!';
+                } else {
+                    this.productForm.barcode = code;
+                    // Try to find by name match
+                    const byName = this.products.find(p => p.name.includes(code) || code.includes(p.name));
+                    if (byName) {
+                        this.productForm.name = byName.name;
+                        this.productForm.price = byName.price;
+                        this.productForm.expiry = byName.expiry || '';
+                        this.productForm.stock = byName.stock;
+                        this.scannerStatus = '✅ بەرهەم دۆزرایەوە!';
+                    } else {
+                        this.scannerStatus = '⚠️ بەرهەم نەدۆزرایەوە، باڕکۆدەکە تۆمارکرا';
+                    }
+                }
+            },
+            
+            manualBarcodeEntry() {
+                const code = prompt('تکایە ژمارەی باڕکۆدەکە بنوسە:');
+                if (code && code.trim()) {
+                    if (this.scannerMode === 'sales') {
+                        this.scanInput = code.trim();
+                        this.addToCartByCode();
+                        this.stopScanner();
+                    } else {
+                        this.findProductByBarcode(code.trim());
+                        setTimeout(() => this.stopScanner(), 1500);
+                    }
                 }
             },
             
@@ -983,7 +996,6 @@
                     this.lastScannedCode = code;
                     this.saveData();
                 } else {
-                    // Add as custom item
                     this.cart.push({ name: code, barcode: 'unknown', price: 0 });
                     this.scanInput = '';
                     this.saveData();
@@ -1055,7 +1067,11 @@
                     receipts: this.receipts,
                     receiptCounter: this.receiptCounter
                 };
-                localStorage.setItem('marketData', JSON.stringify(data));
+                try {
+                    localStorage.setItem('marketData', JSON.stringify(data));
+                } catch(e) {
+                    console.error('Save error:', e);
+                }
             },
             loadData() {
                 const saved = localStorage.getItem('marketData');
@@ -1066,7 +1082,7 @@
                         this.receipts = data.receipts || [];
                         this.receiptCounter = data.receiptCounter || 101;
                     } catch(e) {
-                        console.error('Error loading data:', e);
+                        console.error('Load error:', e);
                     }
                 }
             },
